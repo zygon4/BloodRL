@@ -1,5 +1,5 @@
 # BloodRL
-Beginnings of a Roguelike
+Beginnings of a kitchen-sink vampire Roguelike
 
 Features: 
 * Infinite scroll map generation (RNG is trash though)
