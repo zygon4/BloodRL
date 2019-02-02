@@ -5,6 +5,7 @@ Features:
 * Infinite scroll map generation (RNG is trash though)
 * Shadowcasting
 * Openable/closeable doors
+* Simple wandering "monsters" (no way to interact yet)
 
 TODOs:
 * Too many to list
