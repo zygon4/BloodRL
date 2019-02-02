@@ -1,6 +1,15 @@
 # BloodRL
 Beginnings of a Roguelike
 
+Features: 
+* Infinite scroll map generation (RNG is trash though)
+* Shadowcasting
+* Openable/closeable doors
+
+TODOs:
+* Too many to list
+
+
 Current java main is:
 com.zygon.rl.context.Launcher
 
