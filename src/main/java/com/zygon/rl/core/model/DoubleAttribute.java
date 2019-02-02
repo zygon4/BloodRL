@@ -1,0 +1,28 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.zygon.rl.core.model;
+
+/**
+ *
+ * @author zygon
+ */
+public class DoubleAttribute extends Attribute {
+
+    private final double value;
+
+    private DoubleAttribute(Attribute attribute) {
+        super(attribute.copy());
+        this.value = Double.valueOf(attribute.getValue());
+    }
+
+    public static DoubleAttribute create(Attribute attribute) {
+        return new DoubleAttribute(attribute);
+    }
+
+    public double getDoubleValue() {
+        return value;
+    }
+}
