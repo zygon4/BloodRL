@@ -1,5 +1,7 @@
 # BloodRL
-Beginnings of a kitchen-sink vampire Roguelike
+Beginnings of a kitchen-sink vampire Roguelike:
+
+![Alt text](/images/BloodRL1.png?raw=true "Blood")
 
 Features: 
 * Infinite scroll map generation (RNG is trash though)
@@ -9,7 +11,6 @@ Features:
 
 TODOs:
 * Too many to list
-
 
 Current java main is:
 com.zygon.rl.context.Launcher
