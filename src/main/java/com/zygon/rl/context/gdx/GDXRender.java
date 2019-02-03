@@ -43,7 +43,7 @@ public class GDXRender implements GameRenderer {
         // TODO: move these, need a more specific text area
         this.header = new TextComponent(gameSupplier, g -> {
             String log = g.getLog().stream().collect(Collectors.joining("|"));
-            return g.getDisplayName() + " " + g.getDate() + log;
+            return g.getDisplayName() + "| " + g.getDate() + log;
         }, font, spriteBatch);
 
         this.body = new GDXRegionRenderer(gameSupplier,
