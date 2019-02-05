@@ -5,14 +5,14 @@
  */
 package com.zygon.rl.context.gdx;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.zygon.rl.core.model.Game;
 import com.zygon.rl.core.view.Style;
 
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -21,49 +21,32 @@ import java.util.function.Supplier;
  */
 final class TextComponent extends GDXComponent {
 
-    // TODO: probably needs to be a bifunction, so the implementor can size the text
-    private final Function<Game, String> getDisplayString;
+    private final TriFunction<Game, Integer, Integer, String> getDisplayString;
 
     // all text is bordered for now
-    public TextComponent(Supplier<Game> gameSupplier, Function<Game, String> getDisplayString,
+    public TextComponent(Supplier<Game> gameSupplier, TriFunction<Game, Integer, Integer, String> getDisplayString,
             BitmapFont font, SpriteBatch spriteBatch) {
         super(Style.BORDERED, Color.WHITE, gameSupplier, font, spriteBatch);
         this.getDisplayString = getDisplayString;
     }
 
-    // TODO: this is experimental
-    private boolean tint = false;
     private final Color color = new Color(Color.CYAN);
-    // TODO: this is experimental
 
     @Override
     public void renderComponent(int x, int y, int maxWidth, int maxHeight) {
 
-        float density = Gdx.graphics.getDensity();
-        int fontSize = (int) (density * 12);
-        int fontBuffer = fontSize + 12;
+        String displayString = getDisplayString.apply(getGame(), maxWidth, maxHeight);
 
-        String displayString = getDisplayString.apply(getGame());
-        int idx = 0;
-
-        // TODO: this is experimental
-        if (tint) {
-            color.set(color.r, color.g, color.b + 50, color.a);
-        } else {
-            color.set(color.r, color.g, color.b - 50, color.a);
-        }
-
-        tint = !tint;
-        // TODO: this is experimental
-
-        // TODO: wrapping, alignment, newlines
         Color originalColor = new Color(getFont().getColor());
         getFont().setColor(color);
         try {
-            for (int i = 0; i < displayString.length(); i++) {
-                String character = displayString.charAt(idx++) + "";
-                getFont().draw(getSpriteBatch(), character, x + (idx * fontBuffer), y);
-            }
+            LabelStyle style = new Label.LabelStyle(getFont(), getFont().getColor());
+            Label label = new Label(displayString, style);
+            label.setWrap(true);
+            label.setWidth(maxWidth);
+            label.setX(x);
+            label.setY(y + maxHeight - (getFont().getLineHeight() * 2));
+            label.draw(getSpriteBatch(), 1);
         } finally {
             getFont().setColor(originalColor);
         }
