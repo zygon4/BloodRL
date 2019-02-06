@@ -18,7 +18,7 @@ import com.zygon.rl.core.model.Regions;
 import com.zygon.rl.core.view.ColumnComponent;
 import com.zygon.rl.core.view.Component;
 import com.zygon.rl.core.view.GameRenderer;
-import com.zygon.rl.core.view.HBFComponent;
+import com.zygon.rl.core.view.RowComponent;
 
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -62,18 +62,18 @@ public class GDXRender implements GameRenderer {
             return playerLocation.toString() + " - " + playerLocEntity.getDisplayName() + " - " + contextDisplay;
         }, font, spriteBatch);
 
-        Component hbfComponent = new HBFComponent(header, body, footer);
+        Component headerBody = new RowComponent(header, body, 0.85);
+        Component mainScreen = new RowComponent(headerBody, footer, 0.10);
 
-        gameComponent = new ColumnComponent(
-                hbfComponent,
-                new TextComponent(gameSupplier, (g, w, h) -> {
-                    // TODO: convert width (pixels) to a number of spaces to add as buffer
-                    String log = g.getLog().stream()
-                            .map(l -> String.format("%-" + (l.length() > w ? l : w - l.length()) + "s", l))
-                            .collect(Collectors.joining());
-                    return log;
-                }, font, spriteBatch),
-                .80);
+        Component sideBar = new TextComponent(gameSupplier, (g, w, h) -> {
+            // TODO: convert width (pixels) to a number of spaces to add as buffer
+            String log = g.getLog().stream()
+                    .map(l -> String.format("%-" + (l.length() > w ? l : w - l.length()) + "s", l))
+                    .collect(Collectors.joining());
+            return log;
+        }, font, spriteBatch);
+
+        gameComponent = new ColumnComponent(mainScreen, sideBar, .80);
     }
 
     @Override
