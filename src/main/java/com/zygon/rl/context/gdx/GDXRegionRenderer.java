@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.stewsters.util.shadow.twoDimention.LitMap2d;
+import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
 import com.zygon.rl.common.model.CommonAttributes;
 import com.zygon.rl.common.model.Tile;
 import com.zygon.rl.common.view.FOVHelper;
@@ -22,8 +24,6 @@ import com.zygon.rl.core.model.Location;
 import com.zygon.rl.core.model.Region;
 import com.zygon.rl.core.model.Regions;
 import com.zygon.rl.core.view.Style;
-import com.stewsters.util.shadow.twoDimention.LitMap2d;
-import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
 
 import java.util.Set;
 import java.util.function.Supplier;
@@ -91,7 +91,6 @@ class GDXRegionRenderer extends GDXComponent {
                     double locationLightLevelPct = 1.0;
                     try {
                         if (viewWidthIdx < lightMap.getXSize() && viewHeightIdx < lightMap.getYSize()) {
-                            // TODO: ooh, is this x/y not based on the wrt
                             locationLightLevelPct = lightMap.getLight(viewWidthIdx, viewHeightIdx);
                         }
                     } catch (java.lang.ArrayIndexOutOfBoundsException ex) {
@@ -109,8 +108,11 @@ class GDXRegionRenderer extends GDXComponent {
                         int pixelX = viewWidthIdx * fontBuffer + xx;
                         int pixelY = viewHeightIdx * fontBuffer + yy;
 
-                        // TODO: print fancier font/glyph
                         font.draw(spriteBatch, symbol + "", pixelX, pixelY);
+                        // TODO: print fancier font/glyph
+                        // This is still quirky
+//                        DrawUtil.draw(getFont(), font.getColor(), Optional.of(Color.FIREBRICK),
+//                                getSpriteBatch(), pixelX, pixelY, symbol + "");
                     }
                 }
             }

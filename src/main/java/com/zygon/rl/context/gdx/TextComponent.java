@@ -8,11 +8,10 @@ package com.zygon.rl.context.gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.zygon.rl.core.model.Game;
 import com.zygon.rl.core.view.Style;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -21,6 +20,8 @@ import java.util.function.Supplier;
  */
 final class TextComponent extends GDXComponent {
 
+    // Should be configurable
+    private final Color color = new Color(Color.CYAN);
     private final TriFunction<Game, Integer, Integer, String> getDisplayString;
 
     // all text is bordered for now
@@ -30,25 +31,12 @@ final class TextComponent extends GDXComponent {
         this.getDisplayString = getDisplayString;
     }
 
-    private final Color color = new Color(Color.CYAN);
-
     @Override
     public void renderComponent(int x, int y, int maxWidth, int maxHeight) {
 
         String displayString = getDisplayString.apply(getGame(), maxWidth, maxHeight);
 
-        Color originalColor = new Color(getFont().getColor());
-        getFont().setColor(color);
-        try {
-            LabelStyle style = new Label.LabelStyle(getFont(), getFont().getColor());
-            Label label = new Label(displayString, style);
-            label.setWrap(true);
-            label.setWidth(maxWidth);
-            label.setX(x);
-            label.setY(y + maxHeight - (getFont().getLineHeight() * 2));
-            label.draw(getSpriteBatch(), 1);
-        } finally {
-            getFont().setColor(originalColor);
-        }
+        DrawUtil.draw(getFont(), color, Optional.of(Color.FOREST), getSpriteBatch(),
+                x, (int) (y + maxHeight - (getFont().getLineHeight() * 2)), displayString);
     }
 }
