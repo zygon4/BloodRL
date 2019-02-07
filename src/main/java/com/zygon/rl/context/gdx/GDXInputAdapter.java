@@ -27,7 +27,6 @@ public class GDXInputAdapter implements Supplier<Input> {
 
     @Override
     public Input get() {
-        // TBD: this approach (vs explicit input adapter) is probably slow
         for (int key : this.keyDown) {
             if (Gdx.input.isKeyJustPressed(key)) {
                 Gdx.app.log("Input", "key down: " + key);
