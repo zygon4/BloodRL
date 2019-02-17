@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
  */
 public class Context {
 
-    private final Function<Input, Action> actionProvider;
+    private final BiFunction<Input, Game, Action> actionProvider;
     private final Set<Attribute> attributes;
     private final BiFunction<Action, Game, Game> gameActionProvider;
     private final Supplier<Input> inputSupplier;
@@ -44,7 +43,7 @@ public class Context {
         return copy().setAttributes(attributes).build();
     }
 
-    public Function<Input, Action> getActionProvider() {
+    public BiFunction<Input, Game, Action> getActionProvider() {
         return actionProvider;
     }
 
@@ -84,7 +83,7 @@ public class Context {
 
     public static class Builder {
 
-        private Function<Input, Action> actionProvider;
+        private BiFunction<Input, Game, Action> actionProvider;
         private Set<Attribute> attributes;
         private BiFunction<Action, Game, Game> gameActionProvider;
         private Supplier<Input> inputSupplier;
@@ -103,7 +102,7 @@ public class Context {
             this.displayName = context.getDisplayName();
         }
 
-        public Builder setActionProvider(Function<Input, Action> actionProvider) {
+        public Builder setActionProvider(BiFunction<Input, Game, Action> actionProvider) {
             this.actionProvider = actionProvider;
             return this;
         }

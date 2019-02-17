@@ -95,7 +95,7 @@ public final class Game {
     }
 
     public Action match(Input input) {
-        return getContext().getActionProvider().apply(input);
+        return getContext().getActionProvider().apply(input, this);
     }
 
     // will find the context with this context's name and overwrite it

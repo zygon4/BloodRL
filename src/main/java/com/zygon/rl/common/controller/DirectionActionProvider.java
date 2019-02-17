@@ -7,18 +7,19 @@ package com.zygon.rl.common.controller;
 
 import com.zygon.rl.core.model.Action;
 import com.zygon.rl.core.model.Direction;
+import com.zygon.rl.core.model.Game;
 import com.zygon.rl.core.model.Input;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  *
  * is this common enough?
  */
-public class DirectionActionProvider implements Function<Input, Action> {
+public class DirectionActionProvider implements BiFunction<Input, Game, Action> {
 
     @Override
-    public Action apply(Input i) {
+    public Action apply(Input i, Game g) {
         Action.Builder builder = null;
 
         // TODO: add all locations

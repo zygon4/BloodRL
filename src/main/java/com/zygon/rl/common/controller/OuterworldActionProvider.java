@@ -2,18 +2,20 @@ package com.zygon.rl.common.controller;
 
 import com.zygon.rl.core.model.Action;
 import com.zygon.rl.core.model.Direction;
+import com.zygon.rl.core.model.Game;
 import com.zygon.rl.core.model.Input;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  *
  * @author zygon
  */
-public class OuterworldActionProvider implements Function<Input, Action> {
+public class OuterworldActionProvider implements BiFunction<Input, Game, Action> {
 
+    // TODO: use the game to inspect the location of the direction for non-movement
     @Override
-    public Action apply(Input i) {
+    public Action apply(Input i, Game g) {
         Action.Builder builder = null;
 
         switch (i.getInput()) {
