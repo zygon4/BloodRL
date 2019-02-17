@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 public class BloodGame extends Game {
 
     private final Set<Integer> outerworldGameInputs;
-    private BloodGameScreen feedGameScreen;
+    private BloodGameScreen bloodGameScreen;
     private com.zygon.rl.core.model.Game game;
 
     public BloodGame(Set<Integer> outerworldGameInputs) {
@@ -69,7 +69,7 @@ public class BloodGame extends Game {
         Supplier<com.zygon.rl.core.model.Game> getGame = () -> game;
         Consumer<com.zygon.rl.core.model.Game> setGame = (newGame) -> game = newGame;
 
-        feedGameScreen = new BloodGameScreen(getGame, setGame);
-        setScreen(feedGameScreen);
+        bloodGameScreen = new BloodGameScreen(getGame, setGame);
+        setScreen(bloodGameScreen);
     }
 }
