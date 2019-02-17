@@ -83,22 +83,14 @@ public class BloodGameScreen extends ScreenAdapter {
 
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.gl.glEnable(GL20.GL_BLEND);
 
         camera.update();
 
         spriteBatch.setProjectionMatrix(camera.combined);
 
-//        Color backgroundColor = Color.CORAL;
-//        ShapeRenderer sr = new ShapeRenderer();
-//        sr.begin(ShapeRenderer.ShapeType.Filled);
-//        sr.rect(0, 760, 200, 200,
-//                backgroundColor, backgroundColor, backgroundColor, backgroundColor);
-//        sr.end();
-        // background color
         spriteBatch.begin();
-
         gameRenderer.render(gameSupplier.get());
-
         spriteBatch.end();
 
         // This will update the game state
