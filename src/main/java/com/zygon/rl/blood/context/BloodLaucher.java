@@ -1,6 +1,7 @@
 package com.zygon.rl.blood.context;
 
 import com.zygon.rl.blood.input.InputSets;
+import com.zygon.rl.context.GameContext;
 import com.zygon.rl.context.Launcher;
 
 import java.util.HashSet;
@@ -17,7 +18,7 @@ public class BloodLaucher {
      */
     public static void main(String[] args) {
 
-        Launcher.Context context = new Launcher.Context();
+        GameContext context = new GameContext();
 
         context.setGameTitle("Blood");
         context.setInitialWidth(960);

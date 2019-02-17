@@ -25,13 +25,16 @@ import java.util.function.Supplier;
  */
 public class BloodGame extends Game {
 
+    private final GameContext gameContext;
     private final Set<Integer> outerworldGameInputs;
-    private BloodGameScreen bloodGameScreen;
+
+    private GameScreen bloodGameScreen;
     private com.zygon.rl.core.model.Game game;
 
-    public BloodGame(Set<Integer> outerworldGameInputs) {
-        this.outerworldGameInputs = outerworldGameInputs != null
-                ? Collections.unmodifiableSet(outerworldGameInputs)
+    public BloodGame(GameContext gameContext) {
+        this.gameContext = gameContext;
+        this.outerworldGameInputs = gameContext.getInitialInputSet() != null
+                ? Collections.unmodifiableSet(gameContext.getInitialInputSet())
                 : Collections.emptySet();
     }
 
@@ -53,9 +56,9 @@ public class BloodGame extends Game {
         }
 
         game = com.zygon.rl.core.model.Game.builder()
-                .setName("Blood")
-                .setDescription("Blood")
-                .setDisplayName("Blood")
+                .setName(gameContext.getGameTitle())
+                .setDescription(gameContext.getGameTitle())
+                .setDisplayName(gameContext.getGameTitle())
                 .addContext(Context.builder()
                         .setActionProvider(new OuterworldActionProvider())
                         .setGameActionProvider(new OuterworldGameActionProvider())
@@ -69,7 +72,7 @@ public class BloodGame extends Game {
         Supplier<com.zygon.rl.core.model.Game> getGame = () -> game;
         Consumer<com.zygon.rl.core.model.Game> setGame = (newGame) -> game = newGame;
 
-        bloodGameScreen = new BloodGameScreen(getGame, setGame);
+        bloodGameScreen = new GameScreen(getGame, setGame);
         setScreen(bloodGameScreen);
     }
 }

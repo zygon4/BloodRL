@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.zygon.rl.context;
 
 import com.badlogic.gdx.Gdx;
@@ -23,12 +18,9 @@ import java.util.function.Supplier;
 
 /**
  *
- * TBD: could maybe use an abstract screen
- *
  */
-public class BloodGameScreen extends ScreenAdapter {
+public class GameScreen extends ScreenAdapter {
 
-    // TODO: global get/set of game back to the BloodGame
     private final Supplier<Game> gameSupplier;
     private final Consumer<Game> gameConsumer;
     private final GameController gameController = new GameControllerImpl();
@@ -38,7 +30,7 @@ public class BloodGameScreen extends ScreenAdapter {
     private OrthographicCamera camera;
     private Music music;
 
-    BloodGameScreen(Supplier<Game> gameSupplier, Consumer<Game> gameConsumer) {
+    GameScreen(Supplier<Game> gameSupplier, Consumer<Game> gameConsumer) {
         this.gameSupplier = gameSupplier;
         this.gameConsumer = gameConsumer;
     }

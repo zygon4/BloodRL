@@ -41,6 +41,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
 
     {
         //TODO: Again, can't have gdx here
+
         // escape/quit
         gameInputs.add(Input.Keys.Q);
         // movement
