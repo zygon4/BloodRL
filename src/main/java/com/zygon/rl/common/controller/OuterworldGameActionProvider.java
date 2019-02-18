@@ -61,10 +61,10 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
     }
 
     @Override
-    public Game apply(Action a, Game g) {
-        Game newGame = g;
+    public Game apply(Action action, Game game) {
+        Game newGame = game;
 
-        switch (a.getName()) {
+        switch (action.getName()) {
             case "QUIT":
                 System.exit(0);
             case "CLOSE":
@@ -96,7 +96,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                 break;
             case "MOVE":
                 // Can result in bump-to-interact
-                Map<Regions, Integer> timeTakenByRegion = interactPlayer(a, g);
+                Map<Regions, Integer> timeTakenByRegion = interactPlayer(action, game);
                 Regions regions = timeTakenByRegion.keySet().stream().findAny().orElse(null);
                 int timeTaken = timeTakenByRegion.get(regions);
 
