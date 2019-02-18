@@ -139,13 +139,9 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
 
         // TODO: needs detailed terrain/heights to block entities
         Set<Entity> entities = region.get(destination);
-        if (entities.stream()
+        return !entities.stream()
                 .filter(e -> !e.getAttributes(CommonAttributes.IMPASSABLE.name()).isEmpty())
-                .findAny().isPresent()) {
-            return false;
-        }
-
-        return true;
+                .findAny().isPresent();
     }
 
     // Returns single element of Regions -> time taken
