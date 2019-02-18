@@ -23,7 +23,7 @@ public enum Tile {
     MONSTER(Entities.MONSTER, (e) -> 'm', Color.CYAN),
     PUDDLE(Entities.PUDDLE, (e) -> ',', Color.BLUE),
     PLAYER(Entities.PLAYER, (e) -> '@', Color.MAGENTA),
-    SIGN(Entities.SIGN, (e) -> '^', Color.YELLOW),
+    ROCK(Entities.ROCK, (e) -> ',', Color.YELLOW),
     TREE(Entities.TREE, (e) -> '4', Color.GREEN),
     WALL(Entities.WALL, (e) -> '#', Color.DARK_GRAY),
     WINDOW(Entities.WINDOW, (t) -> {

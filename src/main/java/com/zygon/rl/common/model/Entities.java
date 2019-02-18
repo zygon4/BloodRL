@@ -58,10 +58,10 @@ public class Entities {
             .setDisplayName("grass")
             .build();
 
-    public static Entity SIGN = Entity.builder()
-            .setName("SIGN")
-            .setDescription("Sign")
-            .setDisplayName("sign")
+    public static Entity ROCK = Entity.builder()
+            .setName("ROCK")
+            .setDescription("Rock")
+            .setDisplayName("rock")
             .setAttributes(getAttributes(
                     create(CommonAttributes.TERRAIN_DIFFICULTY.name(), "0.25").build(),
                     create(CommonAttributes.VIEW_BLOCK.name(), "0.1").build()))

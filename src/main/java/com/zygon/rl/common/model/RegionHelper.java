@@ -44,7 +44,7 @@ public class RegionHelper {
                 if (random > 0.98) {
                     optionalEntity = Entities.createMonster();
                 } else if (random > 0.95) {
-                    optionalEntity = Entities.SIGN;
+                    optionalEntity = Entities.ROCK;
                 } else if (random > 0.85) {
                     optionalEntity = Entities.PUDDLE;
                 } else if (random > 0.75) {
@@ -157,7 +157,7 @@ public class RegionHelper {
                     if (random > 0.99) {
                         optionalEntity = Entities.createMonster();
                     } else if (random > 0.95) {
-                        optionalEntity = Entities.SIGN;
+                        optionalEntity = Entities.ROCK;
                     } else if (random > 0.90) {
                         optionalEntity = Entities.TREE;
                     }
