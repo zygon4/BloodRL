@@ -32,7 +32,8 @@ public class FOVHelper {
                 Set<Entity> entities = region.get(Location.create(x, y));
 
                 // TBD: "view blocking" as first attempt at light layering
-                double viewBlocking = entities.parallelStream()
+                // Note this should be parallelStream(), but the runtime kept crashing inexplicably
+                double viewBlocking = entities.stream()
                         .map(e -> e.getAttributes(CommonAttributes.VIEW_BLOCK.name()))
                         .map(a -> {
                             return a.stream()
