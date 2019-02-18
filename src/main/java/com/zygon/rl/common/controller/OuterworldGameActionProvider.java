@@ -129,15 +129,8 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
     }
 
     private boolean canMove(Location destination, Regions regions) {
-
         Region region = regions.getRegion(destination);
 
-        // TODO: This is a workaround for borders until they auto-magically grow at runtime.
-        if (region == null) {
-            return false;
-        }
-
-        // TODO: needs detailed terrain/heights to block entities
         Set<Entity> entities = region.get(destination);
         return !entities.stream()
                 .filter(e -> !e.getAttributes(CommonAttributes.IMPASSABLE.name()).isEmpty())
