@@ -62,7 +62,8 @@ public class Entities {
             .setName("SIGN")
             .setDescription("Sign")
             .setDisplayName("sign")
-            .setAttributes(Collections.singleton(
+            .setAttributes(getAttributes(
+                    create(CommonAttributes.TERRAIN_DIFFICULTY.name(), "0.25").build(),
                     create(CommonAttributes.VIEW_BLOCK.name(), "0.1").build()))
             .build();
 
@@ -99,6 +100,8 @@ public class Entities {
             .setName("PUDDLE")
             .setDescription("A puddle")
             .setDisplayName("puddle")
+            .setAttributes(getAttributes(
+                    create(CommonAttributes.TERRAIN_DIFFICULTY.name(), "0.25").build()))
             .build();
 
     public static Entity WALL = Entity.builder()
