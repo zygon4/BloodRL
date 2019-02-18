@@ -71,7 +71,7 @@ class GDXRegionRenderer extends GDXComponent {
         // TODO: set actual radius based on entity
         try {
             // I think this is better, but still has edge cases when it comes to scroll mapping/sides
-            shadowCaster.recalculateFOV(lightMap.getXSize() / 2, lightMap.getYSize() / 2, 25, .3f);
+            shadowCaster.recalculateFOV(lightMap.getXSize() / 2, lightMap.getYSize() / 2, 50, .5f);
         } catch (java.lang.ArrayIndexOutOfBoundsException aioob) {
             throw new RuntimeException(aioob);
         }
