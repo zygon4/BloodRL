@@ -10,6 +10,7 @@ import com.zygon.rl.core.model.Entity;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  *
@@ -17,19 +18,25 @@ import java.util.Map;
  */
 public enum Tile {
 
-    FLOOR(Entities.FLOOR, '.', Color.YELLOW),
-    DIRT(Entities.DIRT, '.', Color.LIGHT_GRAY),
     // TODO: need to inject conditional logic to provide a door glyph/color
     // based on door attributes and game status (e.g. light/dark)
-    DOOR(Entities.DOOR, '+', Color.ORANGE),
-    GRASS(Entities.GRASS, '"', Color.GREEN),
-    MONSTER(Entities.MONSTER, 'm', Color.CYAN),
-    PUDDLE(Entities.PUDDLE, ',', Color.BLUE),
-    PLAYER(Entities.PLAYER, '@', Color.MAGENTA),
-    SIGN(Entities.SIGN, '^', Color.YELLOW),
-    TREE(Entities.TREE, '4', Color.GREEN),
-    WALL(Entities.WALL, '#', Color.DARK_GRAY),
-    WINDOW(Entities.WINDOW, '*', Color.LIGHT_GRAY);
+    FLOOR(Entities.FLOOR, (e) -> '.', Color.YELLOW),
+    DIRT(Entities.DIRT, (e) -> '.', Color.LIGHT_GRAY),
+    DOOR(Entities.DOOR, (t) -> {
+        Openable openable = new Openable(t);
+        return openable.isClosed() ? '+' : '\\';
+    }, Color.ORANGE),
+    GRASS(Entities.GRASS, (e) -> '"', Color.GREEN),
+    MONSTER(Entities.MONSTER, (e) -> 'm', Color.CYAN),
+    PUDDLE(Entities.PUDDLE, (e) -> ',', Color.BLUE),
+    PLAYER(Entities.PLAYER, (e) -> '@', Color.MAGENTA),
+    SIGN(Entities.SIGN, (e) -> '^', Color.YELLOW),
+    TREE(Entities.TREE, (e) -> '4', Color.GREEN),
+    WALL(Entities.WALL, (e) -> '#', Color.DARK_GRAY),
+    WINDOW(Entities.WINDOW, (t) -> {
+        Openable openable = new Openable(t);
+        return openable.isClosed() ? '*' : '/';
+    }, Color.LIGHT_GRAY);
 
     private static final Map<String, Tile> tilesByEntityName = new HashMap<>();
 
@@ -40,7 +47,8 @@ public enum Tile {
     }
 
     private final Entity entity;
-    private final char glyph;
+    private final Function<Entity, Character> getGlyphFn;
+
     // base color? We need a foreground/background?
     private final Color color;
 
@@ -48,8 +56,8 @@ public enum Tile {
         return entity;
     }
 
-    public char getGlyph() {
-        return glyph;
+    public char getGlyph(Entity entity) {
+        return getGlyphFn.apply(entity);
     }
 
     // Also need a getColor(float lightPct)?
@@ -61,9 +69,9 @@ public enum Tile {
         return tilesByEntityName.get(entity.getName());
     }
 
-    private Tile(Entity entity, char glyph, Color color) {
+    private Tile(Entity entity, Function<Entity, Character> getGlyphFn, Color color) {
         this.entity = entity.copy().build();
-        this.glyph = glyph;
+        this.getGlyphFn = getGlyphFn;
         this.color = color;
     }
 }

@@ -100,19 +100,14 @@ class GDXRegionRenderer extends GDXComponent {
                     if (locationLightLevelPct > .25) {
                         Entity mostViewBlockingEntity = getViewBlockingEntity(entities);
 
-                        Tile tile = Tile.get(mostViewBlockingEntity);
-                        symbol = tile.getGlyph();
-                        font.setColor(tile.getColor().getRed(), tile.getColor().getGreen(),
-                                tile.getColor().getBlue(), tile.getColor().getAlpha());
-
                         int pixelX = viewWidthIdx * fontBuffer + xx;
                         int pixelY = viewHeightIdx * fontBuffer + yy;
 
+                        Tile tile = Tile.get(mostViewBlockingEntity);
+                        symbol = tile.getGlyph(mostViewBlockingEntity);
+                        font.setColor(tile.getColor().getRed(), tile.getColor().getGreen(),
+                                tile.getColor().getBlue(), tile.getColor().getAlpha());
                         font.draw(spriteBatch, symbol + "", pixelX, pixelY);
-                        // TODO: print fancier font/glyph
-                        // This is still quirky
-//                        DrawUtil.draw(getFont(), font.getColor(), Optional.of(Color.FIREBRICK),
-//                                getSpriteBatch(), pixelX, pixelY, symbol + "");
                     }
                 }
             }
