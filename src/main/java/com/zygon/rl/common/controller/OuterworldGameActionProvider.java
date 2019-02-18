@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.zygon.rl.common.controller;
 
 import com.badlogic.gdx.Input;
@@ -97,11 +92,8 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                 // TODO: need to set a text window
                 break;
             case "MOVE":
-                Regions regions = g.getRegions();
-                //
-                // TBD: bump to attack
-                //
-                regions = movePlayer(a, regions);
+                // Can result in bump-to-interact
+                Regions regions = interactPlayer(a, g);
                 newGame = newGame.copy()
                         .moveTime(6, TimeUnit.SECONDS)
                         .setRegions(regions)
@@ -150,41 +142,8 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
         return true;
     }
 
-    // TODO: convert to "system"
-    // TODO: target tracking. Random walk for now.
-//    private Region moveAllMonsters(Region r) {
-//        Set<Location> monsterLocations = r.find(Entities.MONSTER.getName());
-//
-//        for (Location monsterLocation : monsterLocations) {
-//            boolean moved = false;
-//
-//            // TBD: moving all monsters exposes lag, which is probably a good thing, but we don't need
-//            // to ALWAYS move
-//            List<Location> shuffledNeighbors = new ArrayList<>(monsterLocation.getNeighbors().stream()
-//                    .collect(Collectors.collectingAndThen(Collectors.toList(), collected -> {
-//                        Collections.shuffle(collected);
-//                        return collected.stream();
-//                    }))
-//                    .collect(Collectors.toList()));
-//
-//            for (Location monsterNeighbor : shuffledNeighbors) {
-//                if (!moved) {
-//                    if (canMove(monsterNeighbor, r)) {
-//                        Entity monster = r.get(monsterLocation).stream()
-//                                .filter(e -> e.getName().equals("MONSTER"))
-//                                .findAny().orElse(null);
-//
-//                        r = r.move(monster, monsterNeighbor);
-//                        moved = true;
-//                    }
-//                }
-//            }
-//        }
-//
-//        return r;
-//    }
-//
-    private Regions movePlayer(Action action, Regions regions) {
+    private Regions interactPlayer(Action action, Game game) {
+        Regions regions = game.getRegions();
         Location playerLoc = regions.find(Entities.PLAYER).stream()
                 .findAny().get();
         int nextX = playerLoc.getX();
@@ -248,6 +207,16 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
 
             if (destination.getY() - regions.getMinValues().getY() <= growRegionTolerance - 1) {
                 regions = grow(regions, Direction.SOUTH);
+            }
+        } else {
+            // TODO: need to make this more robust to handle other types of
+            // interacts, ie bump to attack
+            OpenDirectionGameActionProvider openDirGameActionProv
+                    = new OpenDirectionGameActionProvider();
+
+            Entity openable = openDirGameActionProv.getOpenable(regions, destination);
+            if (openable != null && new Openable(openable).isClosed()) {
+                regions = openDirGameActionProv.handle(game, destination).getRegions();
             }
         }
 
@@ -397,9 +366,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
             game = super.handle(game, destination);
 
             // TBD: handle multiple "openable" things in the same location?
-            Entity openable = regions.get(destination).stream()
-                    .filter(e -> e.getAttributeValue(CommonAttributes.CLOSED.name()) != null)
-                    .findAny().orElse(null);
+            Entity openable = getOpenable(regions, destination);
 
             if (openable != null) {
                 Openable toOpen = new Openable(openable);
@@ -425,6 +392,15 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
             }
 
             return game;
+        }
+
+        Entity getOpenable(Regions regions, Location destination) {
+            // TBD: handle multiple "openable" things in the same location?
+            Entity openable = regions.get(destination).stream()
+                    .filter(e -> e.getAttributeValue(CommonAttributes.CLOSED.name()) != null)
+                    .findAny().orElse(null);
+
+            return openable;
         }
     }
 }

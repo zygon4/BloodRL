@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.zygon.rl.common.controller;
 
 import com.badlogic.gdx.Gdx;
@@ -99,7 +94,6 @@ public class DirectionGameActionProvider implements BiFunction<Action, Game, Gam
                 })
                 .findAny().orElse(null);
 
-        // TBD: bump to interact
         // TODO: remove gdx from
         Gdx.app.log("action", "examine: " + entity.getDisplayName());
 
