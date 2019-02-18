@@ -22,8 +22,10 @@ import com.zygon.rl.core.model.Region;
 import com.zygon.rl.core.model.Regions;
 import com.zygon.rl.core.view.Style;
 
+import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -103,26 +105,30 @@ class GDXRegionRenderer extends GDXComponent {
                     }
 
                     if (locationLightLevelPct > .25) {
-                        Entity mostViewBlockingEntity = getViewBlockingEntity(entities);
+                        List<Entity> sortedViewBlockingEntity = sortViewBlockingEntity(entities);
+                        Entity mostViewBlockingEntity = sortedViewBlockingEntity.get(0);
 
                         int pixelX = viewWidthIdx * fontBuffer + xx;
                         int pixelY = viewHeightIdx * fontBuffer + yy;
 
-                        Tile tile = Tile.get(mostViewBlockingEntity);
+                        Tile foregroundTile = Tile.get(mostViewBlockingEntity);
+                        java.awt.Color backgroundColor = foregroundTile.getColor();
 
-                        // TODO: need another way to determine background color. Perhaps
-                        // based on a top-down layering, with the 2nd most view-blocking element
-                        // be the background.
+                        if (sortedViewBlockingEntity.size() > 1) {
+                            backgroundColor = Tile.get(sortedViewBlockingEntity.get(1)).getColor();
+                        }
+
+                        // Draw the background color
                         float orig = batch.getPackedColor();
-                        batch.setColor(tile.getBackgroundColor().getRed(), tile.getBackgroundColor().getGreen(),
-                                tile.getBackgroundColor().getBlue(), tile.getBackgroundColor().getAlpha());
+                        batch.setColor(backgroundColor.getRed(), backgroundColor.getGreen(),
+                                backgroundColor.getBlue(), backgroundColor.getAlpha());
                         batch.draw(block, pixelX, pixelY - fontBuffer, fontBuffer, fontBuffer);
                         batch.setPackedColor(orig);
 
-                        // then draw the character
-                        symbol = tile.getGlyph(mostViewBlockingEntity);
-                        font.setColor(tile.getForegroundColor().getRed(), tile.getForegroundColor().getGreen(),
-                                tile.getForegroundColor().getBlue(), tile.getForegroundColor().getAlpha());
+                        // Then draw the character
+                        symbol = foregroundTile.getGlyph(mostViewBlockingEntity);
+                        font.setColor(foregroundTile.getColor().getRed(), foregroundTile.getColor().getGreen(),
+                                foregroundTile.getColor().getBlue(), foregroundTile.getColor().getAlpha());
                         font.draw(batch, symbol + "", pixelX, pixelY, fontBuffer, Align.center, false);
                     }
                 }
@@ -155,27 +161,37 @@ class GDXRegionRenderer extends GDXComponent {
         return regions.getView(bullshitLoc, viewWidthMax, viewHeightMax);
     }
 
-    private Entity getViewBlockingEntity(Set<Entity> entities) {
-        Entity mostViewBlockingEntity = null;
-        double entityViewBlocking = 0.0;
-        for (Entity entity : entities) {
-            Set<Attribute> viewBlocking = entity.getAttributes(CommonAttributes.VIEW_BLOCK.name());
-            if (!viewBlocking.isEmpty()) {
-                double maxViewBlocking = viewBlocking.parallelStream()
-                        .map(DoubleAttribute::create)
-                        .map(DoubleAttribute::getDoubleValue)
-                        .mapToDouble((v) -> v).max()
-                        .orElse(0.0);
-                if (maxViewBlocking > entityViewBlocking) {
-                    mostViewBlockingEntity = entity;
-                    entityViewBlocking = maxViewBlocking;
-                }
-            }
-            if (mostViewBlockingEntity == null) {
-                mostViewBlockingEntity = entity;
-            }
-        }
-        return mostViewBlockingEntity;
+    private double getMaxViewBlock(Entity entity) {
+        Set<Attribute> viewBlocking = entity.getAttributes(CommonAttributes.VIEW_BLOCK.name());
+        return viewBlocking.parallelStream()
+                .map(DoubleAttribute::create)
+                .map(DoubleAttribute::getDoubleValue)
+                .mapToDouble((v) -> v).max()
+                .orElse(0.0);
+    }
+
+    private List<Entity> sortViewBlockingEntity(Set<Entity> entities) {
+        return entities.stream()
+                .sorted((e1, e2) -> {
+                    Set<Attribute> vb1 = e1.getAttributes(CommonAttributes.VIEW_BLOCK.name());
+                    Set<Attribute> vb2 = e2.getAttributes(CommonAttributes.VIEW_BLOCK.name());
+
+                    if (vb1 != null && vb2 == null) {
+                        return -1;
+                    } else if (vb1 == null && vb2 != null) {
+                        return 1;
+                    } else if (vb1 == null && vb2 == null) {
+                        return 0;
+                    }
+
+                    // Both entities have view blocking, sort by which entity
+                    // has the highest view-blocking entity
+                    double e1MaxViewBlock = getMaxViewBlock(e1);
+                    double e2MaxViewBlock = getMaxViewBlock(e2);
+                    return e1MaxViewBlock > e2MaxViewBlock
+                            ? -1 : (e1MaxViewBlock < e2MaxViewBlock ? 1 : 0);
+                })
+                .collect(Collectors.toList());
     }
 
     private static final class LitMap2DImpl implements LitMap2d {
