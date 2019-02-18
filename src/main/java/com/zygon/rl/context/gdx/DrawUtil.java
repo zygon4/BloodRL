@@ -8,8 +8,8 @@ package com.zygon.rl.context.gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
@@ -25,7 +25,7 @@ class DrawUtil {
     }
 
     public static void draw(BitmapFont font, Color fontColor, Optional<Color> backgroundColor,
-            SpriteBatch spriteBatch, int x, int y, String displayString) {
+            Batch batch, int x, int y, String displayString) {
 
         Pixmap labelColor = null;
 
@@ -46,7 +46,7 @@ class DrawUtil {
                 label.getStyle().background = new Image(new Texture(labelColor)).getDrawable();
             }
 
-            label.draw(spriteBatch, 1);
+            label.draw(batch, 1);
         } finally {
             font.setColor(originalColor);
             if (labelColor != null) {

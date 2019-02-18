@@ -18,19 +18,17 @@ import java.util.function.Function;
  */
 public enum Tile {
 
-    // TODO: need to inject conditional logic to provide a door glyph/color
-    // based on door attributes and game status (e.g. light/dark)
     FLOOR(Entities.FLOOR, (e) -> '.', Color.YELLOW),
-    DIRT(Entities.DIRT, (e) -> '.', Color.LIGHT_GRAY),
+    DIRT(Entities.DIRT, (e) -> '.', new Color(109, 57, 4, 1), Color.RED),
     DOOR(Entities.DOOR, (t) -> {
         Openable openable = new Openable(t);
-        return openable.isClosed() ? '+' : '\\';
+        return openable.isClosed() ? '+' : '\'';
     }, Color.ORANGE),
     GRASS(Entities.GRASS, (e) -> '"', Color.GREEN),
     MONSTER(Entities.MONSTER, (e) -> 'm', Color.CYAN),
     PUDDLE(Entities.PUDDLE, (e) -> ',', Color.BLUE),
     PLAYER(Entities.PLAYER, (e) -> '@', Color.MAGENTA),
-    SIGN(Entities.SIGN, (e) -> '^', Color.YELLOW),
+    SIGN(Entities.SIGN, (e) -> '^', new Color(109, 57, 4, 1), Color.YELLOW),
     TREE(Entities.TREE, (e) -> '4', Color.GREEN),
     WALL(Entities.WALL, (e) -> '#', Color.DARK_GRAY),
     WINDOW(Entities.WINDOW, (t) -> {
@@ -48,9 +46,8 @@ public enum Tile {
 
     private final Entity entity;
     private final Function<Entity, Character> getGlyphFn;
-
-    // base color? We need a foreground/background?
-    private final Color color;
+    private final Color backgroundColor;
+    private final Color foregroundColor;
 
     public Entity getEntity() {
         return entity;
@@ -60,18 +57,30 @@ public enum Tile {
         return getGlyphFn.apply(entity);
     }
 
+    // TODO: this is too static, needs to be based on entities at the location,
+    // a monster doesn't know it's background color
+    public Color getBackgroundColor() {
+        return backgroundColor;
+    }
+
     // Also need a getColor(float lightPct)?
-    public Color getColor() {
-        return color;
+    public Color getForegroundColor() {
+        return foregroundColor;
     }
 
     public static Tile get(Entity entity) {
         return tilesByEntityName.get(entity.getName());
     }
 
-    private Tile(Entity entity, Function<Entity, Character> getGlyphFn, Color color) {
+    private Tile(Entity entity, Function<Entity, Character> getGlyphFn,
+            Color backgroundColor, Color foregroundColor) {
         this.entity = entity.copy().build();
         this.getGlyphFn = getGlyphFn;
-        this.color = color;
+        this.backgroundColor = backgroundColor;
+        this.foregroundColor = foregroundColor;
+    }
+
+    private Tile(Entity entity, Function<Entity, Character> getGlyphFn, Color foregroundColor) {
+        this(entity, getGlyphFn, foregroundColor, foregroundColor);
     }
 }

@@ -76,6 +76,7 @@ public class GameScreen extends ScreenAdapter {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         camera.update();
 
@@ -84,6 +85,8 @@ public class GameScreen extends ScreenAdapter {
         spriteBatch.begin();
         gameRenderer.render(gameSupplier.get());
         spriteBatch.end();
+
+        Gdx.gl.glDisable(GL20.GL_BLEND);
 
         // This will update the game state
         processInput();

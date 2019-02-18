@@ -1,15 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.zygon.rl.context.gdx;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Align;
 import com.stewsters.util.shadow.twoDimention.LitMap2d;
 import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
 import com.zygon.rl.common.model.CommonAttributes;
@@ -35,20 +32,28 @@ import java.util.function.Supplier;
 class GDXRegionRenderer extends GDXComponent {
 
     private final FOVHelper fovHelper = new FOVHelper();
-    private final BitmapFont font = new BitmapFont();
+    private final BitmapFont font;
     private final Supplier<Location> withRespectLocationSupplier;
-    private final SpriteBatch spriteBatch;
-    private final OrthographicCamera camera;
+    private final Batch batch;
+
+    // experimental, could also (possibly) use shape render
+    private final Texture block = new Texture(1, 1, Pixmap.Format.RGBA8888);
 
     public GDXRegionRenderer(Supplier<Game> gameSupplier, Supplier<Location> withRespectLocationSupplier,
-            BitmapFont font, SpriteBatch spriteBatch, OrthographicCamera camera) {
-        super(Style.BORDERED, Color.TAN, gameSupplier, font, spriteBatch);
+            BitmapFont font, Batch batch) {
+        super(Style.BORDERED, Color.TAN, gameSupplier, font, batch);
         this.withRespectLocationSupplier = withRespectLocationSupplier;
-        this.spriteBatch = spriteBatch;
-        this.camera = camera;
+        this.font = font;
+        this.batch = batch;
 
         // TODO: use set font, this needs updating when introducing a new symbol, which is dumb
-        this.font.setFixedWidthGlyphs("F^#_,. @m+()");
+        font.setFixedWidthGlyphs("F^#_,. @m+()");
+
+        Pixmap temp = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        temp.setColor(Color.WHITE);
+        temp.fill();
+        block.draw(temp, 0, 0);
+        temp.dispose();
     }
 
     @Override
@@ -104,10 +109,21 @@ class GDXRegionRenderer extends GDXComponent {
                         int pixelY = viewHeightIdx * fontBuffer + yy;
 
                         Tile tile = Tile.get(mostViewBlockingEntity);
+
+                        // TODO: need another way to determine background color. Perhaps
+                        // based on a top-down layering, with the 2nd most view-blocking element
+                        // be the background.
+                        float orig = batch.getPackedColor();
+                        batch.setColor(tile.getBackgroundColor().getRed(), tile.getBackgroundColor().getGreen(),
+                                tile.getBackgroundColor().getBlue(), tile.getBackgroundColor().getAlpha());
+                        batch.draw(block, pixelX, pixelY - fontBuffer, fontBuffer, fontBuffer);
+                        batch.setPackedColor(orig);
+
+                        // then draw the character
                         symbol = tile.getGlyph(mostViewBlockingEntity);
-                        font.setColor(tile.getColor().getRed(), tile.getColor().getGreen(),
-                                tile.getColor().getBlue(), tile.getColor().getAlpha());
-                        font.draw(spriteBatch, symbol + "", pixelX, pixelY);
+                        font.setColor(tile.getForegroundColor().getRed(), tile.getForegroundColor().getGreen(),
+                                tile.getForegroundColor().getBlue(), tile.getForegroundColor().getAlpha());
+                        font.draw(batch, symbol + "", pixelX, pixelY, fontBuffer, Align.center, false);
                     }
                 }
             }

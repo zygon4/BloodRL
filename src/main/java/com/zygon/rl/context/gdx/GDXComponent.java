@@ -6,8 +6,8 @@
 package com.zygon.rl.context.gdx;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.zygon.rl.core.model.Game;
 import com.zygon.rl.core.model.Location;
@@ -27,15 +27,15 @@ public abstract class GDXComponent extends GameComponent {
     private final Supplier<Game> gameSupplier;
     private final BitmapFont font;
     private final ShapeRenderer shapeRenderer = new ShapeRenderer();
-    private final SpriteBatch spriteBatch;
+    private final Batch batch;
 
     public GDXComponent(Style style, Color color, Supplier<Game> gameSupplier,
-            BitmapFont font, SpriteBatch spriteBatch) {
+            BitmapFont font, Batch batch) {
         super(style, gameSupplier);
         this.backgroundColor = color;
         this.gameSupplier = gameSupplier;
         this.font = font;
-        this.spriteBatch = spriteBatch;
+        this.batch = batch;
     }
 
     protected final BitmapFont getFont() {
@@ -46,8 +46,8 @@ public abstract class GDXComponent extends GameComponent {
         return shapeRenderer;
     }
 
-    protected final SpriteBatch getSpriteBatch() {
-        return spriteBatch;
+    protected final Batch getBatch() {
+        return batch;
     }
 
     @Override
@@ -57,7 +57,7 @@ public abstract class GDXComponent extends GameComponent {
         Location maxPixels = null;
 
         if (getStyle() == Style.BORDERED) {
-            BorderedComponent bordered = new BorderedComponent(gameSupplier, font, spriteBatch);
+            BorderedComponent bordered = new BorderedComponent(gameSupplier, font, batch);
             bordered.render(x, y, maxWidth, maxHeight);
 
             minPixels = bordered.getMinPixelLocations();

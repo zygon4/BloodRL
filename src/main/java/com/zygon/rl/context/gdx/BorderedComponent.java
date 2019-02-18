@@ -6,8 +6,9 @@
 package com.zygon.rl.context.gdx;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.zygon.rl.core.model.Game;
 import com.zygon.rl.core.model.Location;
 import com.zygon.rl.core.view.GameComponent;
@@ -23,15 +24,15 @@ public final class BorderedComponent extends GameComponent {
     private static final char CORNER_GLYPH = ' ';
 
     private final BitmapFont font;
-    private final SpriteBatch spriteBatch;
+    private final Batch batch;
 
     private Location minPixels = null;
     private Location maxPixels = null;
 
-    public BorderedComponent(Supplier<Game> gameSupplier, BitmapFont font, SpriteBatch spriteBatch) {
+    public BorderedComponent(Supplier<Game> gameSupplier, BitmapFont font, Batch batch) {
         super(null, gameSupplier);
         this.font = font;
-        this.spriteBatch = spriteBatch;
+        this.batch = batch;
     }
 
     public Location getMinPixelLocations() {
@@ -54,6 +55,11 @@ public final class BorderedComponent extends GameComponent {
         int minY = 0;
         int maxX = 0;
         int maxY = 0;
+
+        Color origColor = new Color(font.getColor().r, font.getColor().g,
+                font.getColor().b, font.getColor().a);
+        // All borders are RED for now
+        font.setColor(Color.RED);
 
         for (int y = 0; y < maxArrayY; y++) {
             for (int x = 0; x < maxArrayX; x++) {
@@ -120,9 +126,11 @@ public final class BorderedComponent extends GameComponent {
                 }
 
                 String value = glyph + "";
-                font.draw(spriteBatch, value, xx + 8 + pixelX, yy + 20 + pixelY);
+                font.draw(batch, value, xx + 8 + pixelX, yy + 20 + pixelY);
             }
         }
+
+        font.setColor(origColor);
 
         minPixels = Location.create(xx + 8 + minX, yy + 20 + minY);
         maxPixels = Location.create(maxX, maxY);

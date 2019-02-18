@@ -36,7 +36,7 @@ final class TextComponent extends GDXComponent {
 
         String displayString = getDisplayString.apply(getGame(), maxWidth, maxHeight);
 
-        DrawUtil.draw(getFont(), color, Optional.of(Color.FOREST), getSpriteBatch(),
+        DrawUtil.draw(getFont(), color, Optional.of(Color.FOREST), getBatch(),
                 x, (int) (y + maxHeight - (getFont().getLineHeight() * 2)), displayString);
     }
 }

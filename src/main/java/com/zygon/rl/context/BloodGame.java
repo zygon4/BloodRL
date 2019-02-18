@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.zygon.rl.context;
 
 import com.badlogic.gdx.Game;
@@ -42,11 +37,10 @@ public class BloodGame extends Game {
     public void create() {
 
         RegionHelper regionHelper = new RegionHelper();
-
         GDXInputAdapter outerworldGameInputAdapter = new GDXInputAdapter(outerworldGameInputs);
-
         Regions regions = Regions.create();
 
+        // This creates the initial map
         for (int y = 0; y < 400; y += 20) {
             for (int x = 0; x < 400; x += 20) {
                 Location loc = Location.create(x, y);

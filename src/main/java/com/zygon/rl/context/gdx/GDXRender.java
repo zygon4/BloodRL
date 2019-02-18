@@ -1,12 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.zygon.rl.context.gdx;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -29,15 +23,10 @@ import java.util.stream.Collectors;
  */
 public class GDXRender implements GameRenderer {
 
-    private final SpriteBatch spriteBatch;
-    private final OrthographicCamera camera;
     private final BitmapFont font = new BitmapFont();
     private final Component gameComponent;
 
     public GDXRender(Supplier<Game> gameSupplier, SpriteBatch spriteBatch, OrthographicCamera camera) {
-        this.spriteBatch = spriteBatch;
-        this.camera = camera;
-
         // TODO: move these, need a more specific text area
         Component header = new TextComponent(gameSupplier, (g, w, h) -> {
             return g.getDisplayName() + "| " + g.getDate();
@@ -45,7 +34,7 @@ public class GDXRender implements GameRenderer {
 
         Component body = new GDXRegionRenderer(gameSupplier,
                 () -> gameSupplier.get().getRegions().find(Entities.PLAYER).stream().findAny().get(),
-                font, spriteBatch, camera);
+                font, spriteBatch);
 
         Component footer = new TextComponent(gameSupplier, (g, w, h) -> {
             // TBD: don't like having this implementation here
@@ -79,13 +68,8 @@ public class GDXRender implements GameRenderer {
     @Override
     public void render(Game game) {
 
-        spriteBatch.setColor(Color.BLACK);
-
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
-
-        // TBD: need to "dispose"?
-        font.setColor(Color.RED);
 
         gameComponent.render(0, 0, (int) w, (int) h);
     }
