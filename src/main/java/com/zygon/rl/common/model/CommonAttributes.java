@@ -15,5 +15,6 @@ public enum CommonAttributes {
     HEALTH,
     IMPASSABLE,
     LOCKED,
+    TERRAIN_DIFFICULTY,
     VIEW_BLOCK
 }

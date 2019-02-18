@@ -10,6 +10,7 @@ import com.zygon.rl.context.gdx.GDXInputAdapter;
 import com.zygon.rl.core.model.Action;
 import com.zygon.rl.core.model.Context;
 import com.zygon.rl.core.model.Direction;
+import com.zygon.rl.core.model.DoubleAttribute;
 import com.zygon.rl.core.model.Entity;
 import com.zygon.rl.core.model.Game;
 import com.zygon.rl.core.model.Location;
@@ -17,7 +18,9 @@ import com.zygon.rl.core.model.Region;
 import com.zygon.rl.core.model.Regions;
 import com.zygon.rl.core.system.GameSystem;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
@@ -93,9 +96,12 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                 break;
             case "MOVE":
                 // Can result in bump-to-interact
-                Regions regions = interactPlayer(a, g);
+                Map<Regions, Integer> timeTakenByRegion = interactPlayer(a, g);
+                Regions regions = timeTakenByRegion.keySet().stream().findAny().orElse(null);
+                int timeTaken = timeTakenByRegion.get(regions);
+
                 newGame = newGame.copy()
-                        .moveTime(6, TimeUnit.SECONDS)
+                        .moveTime(timeTaken, TimeUnit.SECONDS)
                         .setRegions(regions)
                         .build();
                 break;
@@ -142,7 +148,8 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
         return true;
     }
 
-    private Regions interactPlayer(Action action, Game game) {
+    // Returns single element of Regions -> time taken
+    private Map<Regions, Integer> interactPlayer(Action action, Game game) {
         Regions regions = game.getRegions();
         Location playerLoc = regions.find(Entities.PLAYER).stream()
                 .findAny().get();
@@ -184,10 +191,20 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
         }
 
         Location destination = Location.create(nextX, nextY, nextZ);
+        int timeToInteract = 6;
 
         // Could become more robust "getActionsAtDestination"
         if (canMove(destination, regions)) {
             regions = regions.move(Entities.PLAYER, destination);
+
+            // Find the entity with the highest terrain difficultly, if none, then no difficulty
+            double terrainDifficulty = regions.get(destination).stream()
+                    .map(e -> e.getAttributes(CommonAttributes.TERRAIN_DIFFICULTY.name()))
+                    .map(attributes -> attributes.stream().mapToDouble(td -> DoubleAttribute.create(td).getDoubleValue()).max())
+                    .mapToDouble(d -> d.orElse(0.0))
+                    .max().orElse(0.0);
+
+            timeToInteract += (int) (timeToInteract * terrainDifficulty);
 
             // Will probably need to increase this
             int growRegionTolerance = Regions.REGION_EDGE_SIZE * 2;
@@ -220,7 +237,9 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
             }
         }
 
-        return regions;
+        Map<Regions, Integer> result = new HashMap<>();
+        result.put(regions, timeToInteract);
+        return result;
     }
 
     private static Regions grow(final Regions regions, Direction direction) {

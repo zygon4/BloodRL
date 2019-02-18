@@ -28,7 +28,8 @@ public enum Tile {
     PLAYER(Entities.PLAYER, '@', Color.MAGENTA),
     SIGN(Entities.SIGN, '^', Color.YELLOW),
     TREE(Entities.TREE, '4', Color.GREEN),
-    WALL(Entities.WALL, '#', Color.DARK_GRAY);
+    WALL(Entities.WALL, '#', Color.DARK_GRAY),
+    WINDOW(Entities.WINDOW, '*', Color.LIGHT_GRAY);
 
     private static final Map<String, Tile> tilesByEntityName = new HashMap<>();
 

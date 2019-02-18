@@ -209,8 +209,11 @@ public class RegionHelper {
                         Set<Entity> entities = new HashSet<>();
                         entities.add(Entities.DIRT);
 
-                        if (rand.nextDouble() > 0.90) {
+                        double random = rand.nextDouble();
+                        if (random > 0.95) {
                             entities.add(Entities.createDoor());
+                        } else if (random > .90) {
+                            entities.add(Entities.createWindow());
                         } else {
                             entities.add(Entities.WALL);
                         }

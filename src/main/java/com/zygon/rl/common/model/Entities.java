@@ -110,6 +110,17 @@ public class Entities {
                     create(CommonAttributes.VIEW_BLOCK.name(), "1.0").build()))
             .build();
 
+    public static Entity WINDOW = Entity.builder()
+            .setName("WINDOW")
+            .setDescription("Window")
+            .setDisplayName("window")
+            .setAttributes(getAttributes(
+                    CLOSED,
+                    IMPASSABLE,
+                    create(CommonAttributes.TERRAIN_DIFFICULTY.name(), "3.0").build(),
+                    create(CommonAttributes.VIEW_BLOCK.name(), "1.0").build()))
+            .build();
+
     public static Entity createDoor() {
         return DOOR.copy()
                 .setDisplayName(UUID.randomUUID().toString())
@@ -118,6 +129,12 @@ public class Entities {
 
     public static Entity createMonster() {
         return MONSTER.copy()
+                .setDisplayName(UUID.randomUUID().toString())
+                .build();
+    }
+
+    public static Entity createWindow() {
+        return WINDOW.copy()
                 .setDisplayName(UUID.randomUUID().toString())
                 .build();
     }
