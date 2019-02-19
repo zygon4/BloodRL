@@ -22,6 +22,7 @@ import com.zygon.rl.core.model.Region;
 import com.zygon.rl.core.model.Regions;
 import com.zygon.rl.core.view.Style;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -37,6 +38,7 @@ class GDXRegionRenderer extends GDXComponent {
     private final BitmapFont font;
     private final Supplier<Location> withRespectLocationSupplier;
     private final Batch batch;
+    private final Calendar cal = Calendar.getInstance();
 
     // experimental, could also (possibly) use shape render
     private final Texture block = new Texture(1, 1, Pixmap.Format.RGBA8888);
@@ -68,10 +70,25 @@ class GDXRegionRenderer extends GDXComponent {
         float[][] lightResistances = fovHelper.generateSimpleResistances(viewRegion);
         LitMap2d lightMap = new LitMap2DImpl(lightResistances);
         ShadowCaster2d shadowCaster = new ShadowCaster2d(lightMap);
-        // TODO: set actual radius based on entity
+
+        int radius = 50; // TODO: base on player's perception
+
+        cal.setTime(getGame().getDate());
+        int hourOfDay = cal.get(Calendar.HOUR_OF_DAY);
+
+        // Crude radius adjustment based on time. Note this is odd because the initial
+        // implementation is a vampire game where vampires can see in the dark, that
+        // needs to be addressed eventually.
+        if (hourOfDay < 3 || hourOfDay > 21) {
+            radius *= 0.25;
+        } else if (hourOfDay < 6 || hourOfDay > 18) {
+            radius *= 0.5;
+        } else if (hourOfDay < 9 || hourOfDay > 15) {
+            radius *= 0.75;
+        }
+
         try {
-            // I think this is better, but still has edge cases when it comes to scroll mapping/sides
-            shadowCaster.recalculateFOV(lightMap.getXSize() / 2, lightMap.getYSize() / 2, 50, .5f);
+            shadowCaster.recalculateFOV(lightMap.getXSize() / 2, lightMap.getYSize() / 2, radius, .5f);
         } catch (java.lang.ArrayIndexOutOfBoundsException aioob) {
             throw new RuntimeException(aioob);
         }
