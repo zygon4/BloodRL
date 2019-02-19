@@ -28,7 +28,7 @@ public class GDXInputAdapter implements Supplier<Input> {
     @Override
     public Input get() {
         for (int key : this.keyDown) {
-            if (Gdx.input.isKeyJustPressed(key)) {
+            if (Gdx.input.isKeyPressed(key)) {
                 Gdx.app.log("Input", "key down: " + key);
                 return new Input(key);
             }
