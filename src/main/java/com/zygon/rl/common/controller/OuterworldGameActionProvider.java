@@ -149,6 +149,9 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
         Direction dir = Direction.valueOf(action.getValue());
 
         switch (dir) {
+            case HERE:
+                // do nothing
+                break;
             case NORTHEAST:
                 nextX++;
                 nextY++;

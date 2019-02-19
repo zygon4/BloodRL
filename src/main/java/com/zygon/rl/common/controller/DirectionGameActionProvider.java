@@ -47,6 +47,25 @@ public class DirectionGameActionProvider implements BiFunction<Action, Game, Gam
                 Direction dir = Direction.valueOf(a.getValue());
 
                 switch (dir) {
+                    case HERE:
+                        // do nothing
+                        break;
+                    case NORTHEAST:
+                        nextX++;
+                        nextY++;
+                        break;
+                    case NORTHWEST:
+                        nextX--;
+                        nextY++;
+                        break;
+                    case SOUTHEAST:
+                        nextX++;
+                        nextY--;
+                        break;
+                    case SOUTHWEST:
+                        nextX--;
+                        nextY--;
+                        break;
                     case WEST:
                         nextX--;
                         break;

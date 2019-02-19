@@ -40,6 +40,11 @@ public class OuterworldActionProvider implements BiFunction<Input, Game, Action>
                 builder = Action.builder();
                 setMovementFields(builder, Direction.WEST.name());
                 break;
+            case com.badlogic.gdx.Input.Keys.PERIOD:
+            case com.badlogic.gdx.Input.Keys.NUMPAD_5:
+                builder = Action.builder();
+                setMovementFields(builder, Direction.HERE.name());
+                break;
             case com.badlogic.gdx.Input.Keys.J:
             case com.badlogic.gdx.Input.Keys.NUMPAD_2:
                 builder = Action.builder();

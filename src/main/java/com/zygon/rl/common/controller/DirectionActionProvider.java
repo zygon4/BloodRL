@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.zygon.rl.common.controller;
 
 import com.zygon.rl.core.model.Action;
@@ -14,7 +9,7 @@ import java.util.function.BiFunction;
 
 /**
  *
- * is this common enough?
+ * Is this common enough?
  */
 public class DirectionActionProvider implements BiFunction<Input, Game, Action> {
 
@@ -24,6 +19,22 @@ public class DirectionActionProvider implements BiFunction<Input, Game, Action> 
 
         // TODO: add all locations
         switch (i.getInput()) {
+            case com.badlogic.gdx.Input.Keys.NUMPAD_7:
+                builder = Action.builder();
+                setDirectionFields(builder, Direction.NORTHWEST.name());
+                break;
+            case com.badlogic.gdx.Input.Keys.NUMPAD_9:
+                builder = Action.builder();
+                setDirectionFields(builder, Direction.NORTHEAST.name());
+                break;
+            case com.badlogic.gdx.Input.Keys.NUMPAD_1:
+                builder = Action.builder();
+                setDirectionFields(builder, Direction.SOUTHWEST.name());
+                break;
+            case com.badlogic.gdx.Input.Keys.NUMPAD_3:
+                builder = Action.builder();
+                setDirectionFields(builder, Direction.SOUTHEAST.name());
+                break;
             case com.badlogic.gdx.Input.Keys.H:
             case com.badlogic.gdx.Input.Keys.NUMPAD_4:
                 builder = Action.builder();
