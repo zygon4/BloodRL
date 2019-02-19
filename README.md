@@ -13,7 +13,7 @@ TODOs:
 * Too many to list
 
 Current java main is:
-com.zygon.rl.blood.context.BloodLaucher
+com.zygon.rl.blood.context.BloodLauncher
 
 Uses libgdx desktop libraries v1.9.9 and v2.9.3
 stewsters-util v0.18

@@ -11,7 +11,7 @@ import java.util.Set;
  *
  * @author zygon
  */
-public class BloodLaucher {
+public class BloodLauncher {
 
     /**
      * @param args NOT used.
