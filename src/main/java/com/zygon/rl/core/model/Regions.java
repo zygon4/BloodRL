@@ -128,8 +128,7 @@ public class Regions {
         int localStripHeight = Math.min(startRegion.getMaxValues().getY() - localStartY + 1, Math.min(height, REGION_EDGE_SIZE));
         Map<Location, Set<Entity>> outEntitiesByLocation = new HashMap<>();
 
-//        regionView = add(regionView, startRegion, localStartX, localStartY, localStripWidth, localStripHeight);
-        addEXPERIMENTAL(outEntitiesByLocation, regionView, startRegion,
+        add(outEntitiesByLocation, regionView, startRegion,
                 localStartX, localStartY, localStripWidth, localStripHeight);
 
         if ((startLocation.getX() - startRegion.getMinValues().getX()) + width > startRegion.getWidth()) {
@@ -152,8 +151,7 @@ public class Regions {
                 locationOffset += REGION_EDGE_SIZE;
                 remainingWidth -= stripWidth;
 
-//                regionView = add(regionView, eastRegion, startX, startY, stripWidth, stripHeight);
-                addEXPERIMENTAL(outEntitiesByLocation, regionView, eastRegion, startX, startY, stripWidth, stripHeight);
+                add(outEntitiesByLocation, regionView, eastRegion, startX, startY, stripWidth, stripHeight);
             }
         }
 
@@ -176,8 +174,7 @@ public class Regions {
                 locationOffset += REGION_EDGE_SIZE;
                 remainingHeight -= stripHeight;
 
-//                regionView = add(regionView, northRegion, startX, startY, stripWidth, stripHeight);
-                addEXPERIMENTAL(outEntitiesByLocation, regionView, northRegion, startX, startY, stripWidth, stripHeight);
+                add(outEntitiesByLocation, regionView, northRegion, startX, startY, stripWidth, stripHeight);
             }
         }
 
@@ -193,8 +190,7 @@ public class Regions {
 
             // Call recursively
             Region neRegion = getView(start, stripWidth, stripHeight, regionView);
-//            regionView = add(regionView, neRegion, startX, startY, stripWidth, stripHeight);
-            addEXPERIMENTAL(outEntitiesByLocation, regionView, neRegion, startX, startY, stripWidth, stripHeight);
+            add(outEntitiesByLocation, regionView, neRegion, startX, startY, stripWidth, stripHeight);
         }
 
         regionView = regionView.add(outEntitiesByLocation);
@@ -247,30 +243,7 @@ public class Regions {
         return new Regions(regions, minValues, maxValues);
     }
 
-    private Region add(Region toRegion, Region fromRegion,
-            int startX, int startY, int stripWidth, int stripHeight) {
-
-        if (startX + stripWidth > fromRegion.getMaxValues().getX()) {
-//            throw new RuntimeException();
-        }
-
-        if (startY + stripHeight > fromRegion.getMaxValues().getY()) {
-//            throw new RuntimeException();
-        }
-
-        for (int y = startY; y < startY + stripHeight; y++) {
-            for (int x = startX; x < startX + stripWidth; x++) {
-                Location l = Location.create(x, y);
-
-                Set<Entity> entities = fromRegion.get(l);
-                toRegion = toRegion.add(entities, l);
-            }
-        }
-
-        return toRegion;
-    }
-
-    private void addEXPERIMENTAL(Map<Location, Set<Entity>> outEntitiesByLocation,
+    private void add(Map<Location, Set<Entity>> outEntitiesByLocation,
             Region toRegion, Region fromRegion, int startX, int startY, int stripWidth, int stripHeight) {
 
         for (int y = startY; y < startY + stripHeight; y++) {
