@@ -50,9 +50,16 @@ public class Location {
         Set<Location> neighors = new HashSet<>();
 
         neighors.add(Location.create(x + 1, y, z));
+        neighors.add(Location.create(x + 1, y + 1, z));
+
         neighors.add(Location.create(x - 1, y, z));
+        neighors.add(Location.create(x - 1, y - 1, z));
+
         neighors.add(Location.create(x, y + 1, z));
+        neighors.add(Location.create(x - 1, y + 1, z));
+
         neighors.add(Location.create(x, y - 1, z));
+        neighors.add(Location.create(x + 1, y - 1, z));
 
         return neighors;
     }
