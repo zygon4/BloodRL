@@ -5,18 +5,14 @@ package com.zygon.rl.lab.rng.family;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-
 // could go in RNG core
 // TODO: implement equals/hash
 public class Name {
 
     private final String first;
     private final String last;
-    private final FamilyTreeGenerator outer;
 
-    public Name(String first, String last, final FamilyTreeGenerator outer) {
-        this.outer = outer;
+    public Name(String first, String last) {
         this.first = first;
         this.last = last;
     }

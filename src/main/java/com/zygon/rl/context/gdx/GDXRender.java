@@ -14,6 +14,8 @@ import com.zygon.rl.core.view.Component;
 import com.zygon.rl.core.view.GameRenderer;
 import com.zygon.rl.core.view.RowComponent;
 
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -54,7 +56,7 @@ public class GDXRender implements GameRenderer {
         Component headerBody = new RowComponent(header, body, 0.85);
         Component mainScreen = new RowComponent(headerBody, footer, 0.10);
 
-        Component sideBar = new TextComponent(gameSupplier, (g, w, h) -> {
+        Component sideBarTop = new TextComponent(gameSupplier, (g, w, h) -> {
             // TODO: convert width (pixels) to a number of spaces to add as buffer
             String log = g.getLog().stream()
                     .map(l -> String.format("%-" + (l.length() > w ? l : w - l.length()) + "s", l))
@@ -62,7 +64,35 @@ public class GDXRender implements GameRenderer {
             return log;
         }, font, spriteBatch);
 
-        gameComponent = new ColumnComponent(mainScreen, sideBar, .80);
+        Component sideBarBottom = new TextComponent(gameSupplier, (g, w, h) -> {
+
+            Location player = g.getRegions().find(Entities.PLAYER).stream()
+                    .findAny().orElse(null);
+
+            Function<Location, Boolean> distanceFilter = (loc) -> {
+                double dist = loc.getDistance(player);
+                // reality bubble
+                // TODO on visible or "sensable" NPCs
+                return dist < 25;
+            };
+
+            Set<Location> monsterLocations = g.getRegions()
+                    .find(Entities.MONSTER.getName(), distanceFilter);
+
+            String localNPCs = monsterLocations.stream()
+                    .map(loc -> {
+                        return g.getRegions().get(loc).stream()
+                                .filter(e -> e.getName().equals("MONSTER"))
+                                .findAny().orElse(null)
+                                .getDisplayName();
+                    })
+                    .collect(Collectors.joining(" "));
+            return localNPCs;
+        }, font, spriteBatch);
+
+        Component sideBars = new RowComponent(sideBarTop, sideBarBottom, 0.50);
+
+        gameComponent = new ColumnComponent(mainScreen, sideBars, .80);
     }
 
     @Override

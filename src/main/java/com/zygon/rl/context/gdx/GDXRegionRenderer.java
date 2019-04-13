@@ -138,14 +138,15 @@ class GDXRegionRenderer extends GDXComponent {
                         // Draw the background color
                         float orig = batch.getPackedColor();
                         batch.setColor(backgroundColor.getRed(), backgroundColor.getGreen(),
-                                backgroundColor.getBlue(), backgroundColor.getAlpha());
+                                backgroundColor.getBlue(), 0.5f);
+
                         batch.draw(block, pixelX, pixelY - fontBuffer, fontBuffer, fontBuffer);
                         batch.setPackedColor(orig);
 
                         // Then draw the character
                         symbol = foregroundTile.getGlyph(mostViewBlockingEntity);
                         font.setColor(foregroundTile.getColor().getRed(), foregroundTile.getColor().getGreen(),
-                                foregroundTile.getColor().getBlue(), foregroundTile.getColor().getAlpha());
+                                foregroundTile.getColor().getBlue(), 1);
                         font.draw(batch, symbol + "", pixelX, pixelY, fontBuffer, Align.center, false);
                     }
                 }

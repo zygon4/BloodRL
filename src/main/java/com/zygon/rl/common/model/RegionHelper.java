@@ -10,6 +10,7 @@ import com.github.czyzby.noise4j.map.generator.room.dungeon.DungeonGenerator;
 import com.zygon.rl.core.model.Entity;
 import com.zygon.rl.core.model.Location;
 import com.zygon.rl.core.model.Region;
+import com.zygon.rl.lab.rng.family.FamilyTreeGenerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +43,8 @@ public class RegionHelper {
 
                 Entity optionalEntity = null;
                 if (random > 0.98) {
-                    optionalEntity = Entities.createMonster();
+                    optionalEntity = Entities.createMonster(
+                            FamilyTreeGenerator.create().getName().toString());
                 } else if (random > 0.95) {
                     optionalEntity = Entities.ROCK;
                 } else if (random > 0.85) {
@@ -155,7 +157,8 @@ public class RegionHelper {
 
                     Entity optionalEntity = null;
                     if (random > 0.99) {
-                        optionalEntity = Entities.createMonster();
+                        optionalEntity = Entities.createMonster(
+                                FamilyTreeGenerator.create().getName().toString());
                     } else if (random > 0.95) {
                         optionalEntity = Entities.ROCK;
                     } else if (random > 0.90) {

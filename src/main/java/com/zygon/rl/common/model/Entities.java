@@ -130,9 +130,9 @@ public class Entities {
                 .build();
     }
 
-    public static Entity createMonster() {
+    public static Entity createMonster(String name) {
         return MONSTER.copy()
-                .setDisplayName(UUID.randomUUID().toString())
+                .setDisplayName(name)
                 .build();
     }
 

@@ -48,12 +48,12 @@ public class SimpleAI implements GameSystem {
         Location player = regions.find(Entities.PLAYER).stream()
                 .findAny().orElse(null);
 
-        Function<Location, Boolean> foo = (loc) -> {
+        Function<Location, Boolean> distanceFilter = (loc) -> {
             double dist = loc.getDistance(player);
             // reality bubble
             return dist < 50;
         };
-        Set<Location> monsterLocations = regions.find(Entities.MONSTER.getName(), foo);
+        Set<Location> monsterLocations = regions.find(Entities.MONSTER.getName(), distanceFilter);
 
         for (Location monsterLocation : monsterLocations) {
 

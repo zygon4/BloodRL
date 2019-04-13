@@ -25,7 +25,7 @@ class DrawUtil {
     }
 
     public static void draw(BitmapFont font, Color fontColor, Optional<Color> backgroundColor,
-            Batch batch, int x, int y, String displayString) {
+            Batch batch, int x, int y, int width, int height, String displayString) {
 
         Pixmap labelColor = null;
 
@@ -35,9 +35,12 @@ class DrawUtil {
         try {
             Label.LabelStyle style = new Label.LabelStyle(font, font.getColor());
             Label label = new Label(displayString, style);
+//            label.setX(x);
+//            label.setY(y);
+            label.setPosition(x, y);
+            label.setWidth(width);
+            label.setHeight(height);
             label.setWrap(true);
-            label.setX(x);
-            label.setY(y);
 
             if (backgroundColor.isPresent()) {
                 labelColor = new Pixmap((int) label.getWidth(), (int) label.getHeight(), Pixmap.Format.RGB888);

@@ -21,11 +21,12 @@ public enum Tile {
     }, Color.ORANGE),
     GRASS(Entities.GRASS, (e) -> '.', Color.GREEN),
     MONSTER(Entities.MONSTER, (e) -> 'm', Color.CYAN),
-    PUDDLE(Entities.PUDDLE, (e) -> ',', Color.BLUE),
+    PUDDLE(Entities.PUDDLE, (e) -> '~', Color.BLUE),
     PLAYER(Entities.PLAYER, (e) -> '@', Color.MAGENTA),
     ROCK(Entities.ROCK, (e) -> ',', Color.YELLOW),
     TREE(Entities.TREE, (e) -> '4', Color.GREEN),
-    WALL(Entities.WALL, (e) -> '#', Color.DARK_GRAY),
+    // RED has a contrast for now
+    WALL(Entities.WALL, (e) -> '#', Color.RED),
     WINDOW(Entities.WINDOW, (t) -> {
         Openable openable = new Openable(t);
         return openable.isClosed() ? '*' : '/';

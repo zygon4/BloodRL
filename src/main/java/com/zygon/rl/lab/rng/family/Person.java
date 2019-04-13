@@ -5,17 +5,13 @@ package com.zygon.rl.lab.rng.family;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-
 // TODO: implement equals/hash
-final class Person {
+public final class Person {
 
     private final Name name;
     private final Sex sex;
-    private final FamilyTreeGenerator outer;
 
-    public Person(Name name, Sex sex, final FamilyTreeGenerator outer) {
-        this.outer = outer;
+    public Person(Name name, Sex sex) {
         this.name = name;
         this.sex = sex;
     }
