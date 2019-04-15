@@ -45,7 +45,6 @@ public class Location {
         return Math.sqrt(total);
     }
 
-    // 4 directions, TODO: add diagonal
     public Set<Location> getNeighbors() {
         Set<Location> neighors = new HashSet<>();
 

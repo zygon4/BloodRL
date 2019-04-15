@@ -44,9 +44,6 @@ public class Regions {
 
     public Regions add(Region region) {
 
-        // TODO: remove this
-        System.out.println("Adding region " + region);
-
         Map<Location, Region> regions = new HashMap<>(regionsByLocation);
         add(region, regions);
 

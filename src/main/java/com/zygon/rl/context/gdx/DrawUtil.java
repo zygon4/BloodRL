@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Align;
 
 import java.util.Optional;
 
@@ -35,9 +36,7 @@ class DrawUtil {
         try {
             Label.LabelStyle style = new Label.LabelStyle(font, font.getColor());
             Label label = new Label(displayString, style);
-//            label.setX(x);
-//            label.setY(y);
-            label.setPosition(x, y);
+            label.setPosition(x, y, Align.bottomLeft);
             label.setWidth(width);
             label.setHeight(height);
             label.setWrap(true);

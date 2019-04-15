@@ -80,6 +80,13 @@ public class GDXRender implements GameRenderer {
                     .find(Entities.MONSTER.getName(), distanceFilter);
 
             String localNPCs = monsterLocations.stream()
+                    .sorted((l1, l2) -> {
+                        // sort mobs by distance to player
+                        double l1Dist = player.getDistance(l1);
+                        double l2Dist = player.getDistance(l2);
+
+                        return l1Dist > l2Dist ? 1 : (l1Dist < l2Dist ? -1 : 0);
+                    })
                     .map(loc -> {
                         return g.getRegions().get(loc).stream()
                                 .filter(e -> e.getName().equals("MONSTER"))
