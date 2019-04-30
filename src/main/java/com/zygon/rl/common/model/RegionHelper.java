@@ -75,47 +75,13 @@ public class RegionHelper {
         return generateRegion(Location.create(0, 0), maxX, maxY);
     }
 
-    // TODO:
-//    private Region smooth(Region region, int times) {
-//        Tile[][] tiles2 = new Tile[width][height];
-//
-//        for (int time = 0; time < times; time++) {
-//
-//            for (int x = 0; x < width; x++) {
-//                for (int y = 0; y < height; y++) {
-//                    int floors = 0;
-//                    int rocks = 0;
-//
-//                    for (int ox = -1; ox < 2; ox++) {
-//                        for (int oy = -1; oy < 2; oy++) {
-//                            if (x + ox < 0 || x + ox >= width || y + oy < 0
-//                                    || y + oy >= height) {
-//                                continue;
-//                            }
-//
-//                            if (tiles[x + ox][y + oy] == Tile.FLOOR) {
-//                                floors++;
-//                            } else {
-//                                rocks++;
-//                            }
-//                        }
-//                    }
-//                    tiles2[x][y] = floors >= rocks ? Tile.FLOOR : Tile.WALL;
-//                }
-//            }
-//
-//            tiles = tiles2;
-//        }
-//
-//        return this;
-//    }
     // Lots of API possibilities here, for now, just return Regions, eventually return Regions
-    public static Region generateCity(int maxX, int maxY, boolean withPlayer) {
+    public Region generateCity(int maxX, int maxY, boolean withPlayer) {
         return generateCity(Location.create(0, 0), maxX, maxY, withPlayer);
     }
 
     // boolean withPlayer - hack for now
-    public static Region generateCity(Location start, int maxX, int maxY, boolean withPlayer) {
+    public Region generateCity(Location start, int maxX, int maxY, boolean withPlayer) {
 
         Region region = new Region();
 
@@ -184,7 +150,7 @@ public class RegionHelper {
         return region;
     }
 
-    public static Region generateCity(Location start, int maxX, int maxY) {
+    public Region generateCity(Location start, int maxX, int maxY) {
         return generateCity(start, maxX, maxY, false);
     }
 

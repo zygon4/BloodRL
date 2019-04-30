@@ -36,6 +36,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
     private final Set<Integer> gameInputs = new HashSet<>();
     private final GDXInputAdapter directionInputAdapter;
     private final GameSystem simpleAi = new SimpleAI();
+    private final RegionHelper regionHelper = new RegionHelper();
 
     {
         //TODO: Again, can't have gdx here
@@ -203,19 +204,19 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
 
             // Logic to grow the region space
             if (regions.getMaxValues().getX() - destination.getX() <= growRegionTolerance - 1) {
-                regions = grow(regions, Direction.EAST);
+                regions = grow(regions, Direction.EAST, regionHelper);
             }
 
             if (regions.getMaxValues().getY() - destination.getY() <= growRegionTolerance - 1) {
-                regions = grow(regions, Direction.NORTH);
+                regions = grow(regions, Direction.NORTH, regionHelper);
             }
 
             if (destination.getX() - regions.getMinValues().getX() <= growRegionTolerance - 1) {
-                regions = grow(regions, Direction.WEST);
+                regions = grow(regions, Direction.WEST, regionHelper);
             }
 
             if (destination.getY() - regions.getMinValues().getY() <= growRegionTolerance - 1) {
-                regions = grow(regions, Direction.SOUTH);
+                regions = grow(regions, Direction.SOUTH, regionHelper);
             }
         } else {
             // TODO: need to make this more robust to handle other types of
@@ -234,7 +235,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
         return result;
     }
 
-    private static Regions grow(final Regions regions, Direction direction) {
+    private static Regions grow(final Regions regions, Direction direction, RegionHelper regionHelper) {
         Regions newRegions = regions;
         int numberOfRegions = calcSideRegions(newRegions, direction);
 
@@ -249,7 +250,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                     }
 
                     Location loc = Location.create(startingX, newLocationY);
-                    Region newRegion = RegionHelper.generateCity(loc,
+                    Region newRegion = regionHelper.generateCity(loc,
                             Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE);
                     newRegions = newRegions.add(newRegion);
                 }
@@ -265,7 +266,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                     }
 
                     Location loc = Location.create(startingX, newLocationY);
-                    Region newRegion = RegionHelper.generateCity(loc,
+                    Region newRegion = regionHelper.generateCity(loc,
                             Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE);
                     newRegions = newRegions.add(newRegion);
                 }
@@ -281,7 +282,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                     }
 
                     Location loc = Location.create(newLocationX, startingY);
-                    Region newRegion = RegionHelper.generateCity(loc,
+                    Region newRegion = regionHelper.generateCity(loc,
                             Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE);
                     newRegions = newRegions.add(newRegion);
                 }
@@ -297,7 +298,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                     }
 
                     Location loc = Location.create(newLocationX, startingY);
-                    Region newRegion = RegionHelper.generateCity(loc,
+                    Region newRegion = regionHelper.generateCity(loc,
                             Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE);
                     newRegions = newRegions.add(newRegion);
                 }
