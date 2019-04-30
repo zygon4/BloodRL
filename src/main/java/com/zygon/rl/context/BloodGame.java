@@ -45,7 +45,7 @@ public class BloodGame extends Game {
             for (int x = 0; x < 400; x += 20) {
                 Location loc = Location.create(x, y);
                 boolean addPlayer = x == 200 && y == 200;
-                regions = regions.add(regionHelper.generateCity(loc, 20, 20, addPlayer));
+                regions = regions.add(regionHelper.generateRegion(loc, 20, 20, addPlayer));
             }
         }
 

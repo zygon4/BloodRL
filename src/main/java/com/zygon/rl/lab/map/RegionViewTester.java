@@ -25,13 +25,13 @@ public class RegionViewTester {
 
         RegionHelper regionHelper = new RegionHelper();
 
-        Region r1 = regionHelper.generateRegion(Location.create(0, 0),
+        Region r1 = regionHelper.generateDeprecatedRegion(Location.create(0, 0),
                 Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE);
-        Region r2 = regionHelper.generateRegion(Location.create(10, 0),
+        Region r2 = regionHelper.generateDeprecatedRegion(Location.create(10, 0),
                 Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE);
-        Region r3 = regionHelper.generateRegion(Location.create(0, 10),
+        Region r3 = regionHelper.generateDeprecatedRegion(Location.create(0, 10),
                 Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE);
-        Region r4 = regionHelper.generateRegion(Location.create(10, 10),
+        Region r4 = regionHelper.generateDeprecatedRegion(Location.create(10, 10),
                 Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE);
 
         regionManager = regionManager.add(r1);

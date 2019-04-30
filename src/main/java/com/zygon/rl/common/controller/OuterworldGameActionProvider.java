@@ -250,8 +250,8 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                     }
 
                     Location loc = Location.create(startingX, newLocationY);
-                    Region newRegion = regionHelper.generateCity(loc,
-                            Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE);
+                    Region newRegion = regionHelper.generateRegion(loc,
+                            Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
                     newRegions = newRegions.add(newRegion);
                 }
             }
@@ -266,8 +266,8 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                     }
 
                     Location loc = Location.create(startingX, newLocationY);
-                    Region newRegion = regionHelper.generateCity(loc,
-                            Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE);
+                    Region newRegion = regionHelper.generateRegion(loc,
+                            Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
                     newRegions = newRegions.add(newRegion);
                 }
             }
@@ -282,8 +282,8 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                     }
 
                     Location loc = Location.create(newLocationX, startingY);
-                    Region newRegion = regionHelper.generateCity(loc,
-                            Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE);
+                    Region newRegion = regionHelper.generateRegion(loc,
+                            Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
                     newRegions = newRegions.add(newRegion);
                 }
             }
@@ -298,8 +298,8 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                     }
 
                     Location loc = Location.create(newLocationX, startingY);
-                    Region newRegion = regionHelper.generateCity(loc,
-                            Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE);
+                    Region newRegion = regionHelper.generateRegion(loc,
+                            Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
                     newRegions = newRegions.add(newRegion);
                 }
             }
