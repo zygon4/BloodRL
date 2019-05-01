@@ -72,13 +72,14 @@ public class RegionHelper {
         return region;
     }
 
+    // TODO: for all of these adjustable weights, put them into JSON!!
     public Region generateForestRegion(Location start, int maxX, int maxY, boolean withPlayer) {
 
         // TODO: make static OR add noise
         Map<Double, Entity> entitiesByWeight = new HashMap<>();
-        entitiesByWeight.put(0.70, Entities.GRASS);
+        entitiesByWeight.put(0.69, Entities.GRASS);
         entitiesByWeight.put(0.20, Entities.TREE);
-        entitiesByWeight.put(0.05, Entities.DIRT);
+        entitiesByWeight.put(0.06, Entities.DIRT);
         entitiesByWeight.put(0.05, Entities.PUDDLE);
 
         return generateRegion(start, maxX, maxY, entitiesByWeight, false, withPlayer);
@@ -88,9 +89,9 @@ public class RegionHelper {
 
         // TODO: make static OR add noise
         Map<Double, Entity> entitiesByWeight = new HashMap<>();
-        entitiesByWeight.put(0.85, Entities.GRASS);
-        entitiesByWeight.put(0.05, Entities.TREE);
-        entitiesByWeight.put(0.05, Entities.DIRT);
+        entitiesByWeight.put(0.82, Entities.GRASS);
+        entitiesByWeight.put(0.07, Entities.TREE);
+        entitiesByWeight.put(0.06, Entities.DIRT);
         entitiesByWeight.put(0.05, Entities.PUDDLE);
 
         return generateRegion(start, maxX, maxY, entitiesByWeight, false, withPlayer);
@@ -100,10 +101,10 @@ public class RegionHelper {
 
         // TODO: make static OR add noise
         Map<Double, Entity> entitiesByWeight = new HashMap<>();
-        entitiesByWeight.put(0.35, Entities.PUDDLE);
-        entitiesByWeight.put(0.20, Entities.DIRT);
+        entitiesByWeight.put(0.40, Entities.PUDDLE);
         entitiesByWeight.put(0.35, Entities.GRASS);
-        entitiesByWeight.put(0.10, Entities.TREE);
+        entitiesByWeight.put(0.20, Entities.DIRT);
+        entitiesByWeight.put(0.05, Entities.TREE);
 
         return generateRegion(start, maxX, maxY, entitiesByWeight, false, withPlayer);
     }
@@ -112,9 +113,9 @@ public class RegionHelper {
 
         // TODO: make static OR add noise
         Map<Double, Entity> entitiesByWeight = new HashMap<>();
-        entitiesByWeight.put(0.85, Entities.GRASS);
-        entitiesByWeight.put(0.05, Entities.TREE);
-        entitiesByWeight.put(0.05, Entities.DIRT);
+        entitiesByWeight.put(0.82, Entities.GRASS);
+        entitiesByWeight.put(0.07, Entities.TREE);
+        entitiesByWeight.put(0.06, Entities.DIRT);
         entitiesByWeight.put(0.05, Entities.PUDDLE);
 
         return generateRegion(start, maxX, maxY, entitiesByWeight, true, withPlayer);
@@ -209,10 +210,10 @@ public class RegionHelper {
 
         RandomCollection<Terrain> randomTerrain = new RandomCollection<>();
 
-        randomTerrain.add(0.10, Terrain.CITY);
-        randomTerrain.add(0.60, Terrain.FIELD);
+        randomTerrain.add(0.05, Terrain.CITY);
+        randomTerrain.add(0.65, Terrain.FIELD);
         randomTerrain.add(0.20, Terrain.FOREST);
-        randomTerrain.add(0.15, Terrain.SWAMP);
+        randomTerrain.add(0.10, Terrain.SWAMP);
 
         switch (randomTerrain.next()) {
             case CITY:
@@ -291,6 +292,9 @@ public class RegionHelper {
 
     private final class RandomCollection<E> {
 
+        // Ugh, this collapses on the weight so you can't have multiple
+        // terrains with the exact same weight.
+        // TODO: fix this
         private final NavigableMap<Double, E> map = new TreeMap<>();
         private final Random random;
         private double total = 0;
