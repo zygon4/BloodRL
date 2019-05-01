@@ -7,10 +7,8 @@ package com.zygon.rl.context.gdx;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
 
@@ -42,10 +40,11 @@ class DrawUtil {
             label.setWrap(true);
 
             if (backgroundColor.isPresent()) {
-                labelColor = new Pixmap((int) label.getWidth(), (int) label.getHeight(), Pixmap.Format.RGB888);
-                labelColor.setColor(backgroundColor.get());
-                labelColor.fill();
-                label.getStyle().background = new Image(new Texture(labelColor)).getDrawable();
+                // TODO: use background color - it's too slow for now
+//                labelColor = new Pixmap((int) label.getWidth(), (int) label.getHeight(), Pixmap.Format.RGB888);
+//                labelColor.setColor(backgroundColor.get());
+//                labelColor.fill();
+//                label.getStyle().background = new Image(new Texture(labelColor)).getDrawable();
             }
 
             label.draw(batch, 1);

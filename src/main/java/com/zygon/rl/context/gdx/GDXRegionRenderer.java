@@ -135,14 +135,13 @@ class GDXRegionRenderer extends GDXComponent {
                             backgroundColor = Tile.get(sortedViewBlockingEntity.get(1)).getColor();
                         }
 
-                        // Draw the background color
-                        float orig = batch.getPackedColor();
-                        batch.setColor(backgroundColor.getRed(), backgroundColor.getGreen(),
-                                backgroundColor.getBlue(), 0.5f);
-
-                        batch.draw(block, pixelX, pixelY - fontBuffer, fontBuffer, fontBuffer);
-                        batch.setPackedColor(orig);
-
+                        // TODO: Draw the background color - it's too slow and ugly right now
+//                        float orig = batch.getPackedColor();
+//                        batch.setColor(backgroundColor.getRed(), backgroundColor.getGreen(),
+//                                backgroundColor.getBlue(), 0.5f);
+//
+//                        batch.draw(block, pixelX, pixelY - fontBuffer, fontBuffer, fontBuffer);
+//                        batch.setPackedColor(orig);
                         // Then draw the character
                         symbol = foregroundTile.getGlyph(mostViewBlockingEntity);
                         font.setColor(foregroundTile.getColor().getRed(), foregroundTile.getColor().getGreen(),
