@@ -104,6 +104,12 @@ public class Entities {
                     create(CommonAttributes.TERRAIN_DIFFICULTY.name(), "0.25").build()))
             .build();
 
+    public static Entity TALL_GRASS = Entity.builder()
+            .setName("TALL_GRASS")
+            .setDescription("Tall grass")
+            .setDisplayName("tall grass")
+            .build();
+
     public static Entity WALL = Entity.builder()
             .setName("WALL")
             .setDescription("Wall")

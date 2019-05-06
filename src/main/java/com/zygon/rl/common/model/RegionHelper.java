@@ -88,9 +88,8 @@ public class RegionHelper {
 
         Map<Double, Entity> layerOneEntitiesByWeight = new HashMap<>();
 
-        layerOneEntitiesByWeight.put(0.91, null);
+        layerOneEntitiesByWeight.put(0.93, null);
         layerOneEntitiesByWeight.put(0.06, Entities.TREE);
-        layerOneEntitiesByWeight.put(MONSTER_RAND_WEIGHT, Entities.MONSTER);
         layerOneEntitiesByWeight.put(PLAYER_RAND_WEIGHT, Entities.PLAYER);
 
         List<Map<Double, Entity>> entityLayers = new ArrayList<>();
@@ -103,15 +102,15 @@ public class RegionHelper {
 
         // TODO: make static OR add noise, ditch the numberNames
         Map<Double, Entity> layerZeroEntitiesByWeight = new HashMap<>();
-        layerZeroEntitiesByWeight.put(0.85, Entities.GRASS);
+        layerZeroEntitiesByWeight.put(0.75, Entities.GRASS);
+        layerZeroEntitiesByWeight.put(0.10, Entities.TALL_GRASS);
         layerZeroEntitiesByWeight.put(0.10, Entities.DIRT);
         layerZeroEntitiesByWeight.put(0.05, Entities.PUDDLE);
 
         Map<Double, Entity> layerOneEntitiesByWeight = new HashMap<>();
 
-        layerOneEntitiesByWeight.put(0.95, null);
+        layerOneEntitiesByWeight.put(0.97, null);
         layerOneEntitiesByWeight.put(0.02, Entities.TREE);
-        layerOneEntitiesByWeight.put(MONSTER_RAND_WEIGHT, Entities.MONSTER);
         layerOneEntitiesByWeight.put(PLAYER_RAND_WEIGHT, Entities.PLAYER);
 
         List<Map<Double, Entity>> entityLayers = new ArrayList<>();
@@ -130,9 +129,8 @@ public class RegionHelper {
 
         Map<Double, Entity> layerOneEntitiesByWeight = new HashMap<>();
 
-        layerOneEntitiesByWeight.put(0.92, null);
+        layerOneEntitiesByWeight.put(0.94, null);
         layerOneEntitiesByWeight.put(0.05, Entities.TREE);
-        layerOneEntitiesByWeight.put(MONSTER_RAND_WEIGHT, Entities.MONSTER);
         layerOneEntitiesByWeight.put(PLAYER_RAND_WEIGHT, Entities.PLAYER);
 
         List<Map<Double, Entity>> entityLayers = new ArrayList<>();
@@ -162,7 +160,6 @@ public class RegionHelper {
         return generateRegion(start, maxX, maxY, entityLayers, true);
     }
 
-    // TODO: I believe this is bad - it clobbers a location vs "melding" with it.
     private Region smooth(Region region, Location start, int maxX, int maxY,
             List<Location> availablePlayerLocations,
             Map<Location, Set<Entity>> cityEntitiesByLocation,
@@ -239,7 +236,6 @@ public class RegionHelper {
         return newRegion;
     }
 
-    // boolean withPlayer - hack for now
     private Region generateRegion(Location start, int maxX, int maxY,
             List<Map<Double, Entity>> entityLayers, boolean fillCity) {
 

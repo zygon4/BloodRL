@@ -20,6 +20,7 @@ public enum Tile {
         return openable.isClosed() ? '+' : '\'';
     }, Color.ORANGE),
     GRASS(Entities.GRASS, (e) -> '.', Color.GREEN),
+    TALL_GRASS(Entities.TALL_GRASS, (e) -> '"', Color.GREEN),
     MONSTER(Entities.MONSTER, (e) -> 'm', Color.CYAN),
     PUDDLE(Entities.PUDDLE, (e) -> '~', Color.BLUE),
     PLAYER(Entities.PLAYER, (e) -> '@', Color.MAGENTA),
