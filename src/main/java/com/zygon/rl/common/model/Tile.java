@@ -26,8 +26,7 @@ public enum Tile {
     PLAYER(Entities.PLAYER, (e) -> '@', Color.MAGENTA),
     ROCK(Entities.ROCK, (e) -> ',', Color.YELLOW),
     TREE(Entities.TREE, (e) -> '4', Color.GREEN),
-    // RED has a contrast for now
-    WALL(Entities.WALL, (e) -> '#', Color.RED),
+    WALL(Entities.WALL, (e) -> '#', Color.DARK_GRAY),
     WINDOW(Entities.WINDOW, (t) -> {
         Openable openable = new Openable(t);
         return openable.isClosed() ? '*' : '/';
