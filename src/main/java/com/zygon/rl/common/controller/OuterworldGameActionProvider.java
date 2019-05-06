@@ -20,6 +20,7 @@ import com.zygon.rl.core.system.GameSystem;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -132,7 +133,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
     private boolean canMove(Location destination, Regions regions) {
         Region region = regions.getRegion(destination);
 
-        Set<Entity> entities = region.get(destination);
+        List<Entity> entities = region.get(destination);
         return !entities.stream()
                 .filter(e -> !e.getAttributes(CommonAttributes.IMPASSABLE.name()).isEmpty())
                 .findAny().isPresent();

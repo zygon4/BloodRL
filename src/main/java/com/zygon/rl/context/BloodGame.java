@@ -3,6 +3,7 @@ package com.zygon.rl.context;
 import com.badlogic.gdx.Game;
 import com.zygon.rl.common.controller.OuterworldActionProvider;
 import com.zygon.rl.common.controller.OuterworldGameActionProvider;
+import com.zygon.rl.common.model.Entities;
 import com.zygon.rl.common.model.RegionHelper;
 import com.zygon.rl.context.gdx.GDXInputAdapter;
 import com.zygon.rl.core.model.Context;
@@ -13,6 +14,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -47,6 +49,19 @@ public class BloodGame extends Game {
                 boolean addPlayer = x == 200 && y == 200;
                 regions = regions.add(regionHelper.generateRegion(loc, 20, 20, addPlayer));
             }
+        }
+
+        // TBD: this is a mild hack, removing the extra player entities after
+        // all the initial regions are generated.
+        Set<Location> removePlayers = regions.find(Entities.PLAYER).stream()
+                .skip(1)
+                .collect(Collectors.toSet());
+        for (Location removePlayerLoc : removePlayers) {
+            regions = regions.remove(Entities.PLAYER, removePlayerLoc);
+        }
+
+        if (regions.find(Entities.PLAYER).isEmpty()) {
+            throw new RuntimeException("No player generated");
         }
 
         game = com.zygon.rl.core.model.Game.builder()

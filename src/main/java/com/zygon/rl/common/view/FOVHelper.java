@@ -11,7 +11,7 @@ import com.zygon.rl.core.model.Entity;
 import com.zygon.rl.core.model.Location;
 import com.zygon.rl.core.model.Region;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  *
@@ -29,7 +29,7 @@ public class FOVHelper {
 
         for (int x = minValues.getX(); x < minValues.getX() + width; x++) {
             for (int y = minValues.getY(); y < minValues.getY() + height; y++) {
-                Set<Entity> entities = region.get(Location.create(x, y));
+                List<Entity> entities = region.get(Location.create(x, y));
 
                 // TBD: "view blocking" as first attempt at light layering
                 // Note this should be parallelStream(), but the runtime kept crashing inexplicably

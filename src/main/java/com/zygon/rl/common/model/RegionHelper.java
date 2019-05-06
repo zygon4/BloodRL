@@ -19,9 +19,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -72,58 +74,174 @@ public class RegionHelper {
         return region;
     }
 
+    private static final double MONSTER_RAND_WEIGHT = .02;
+    private static final double PLAYER_RAND_WEIGHT = .01;
+
     // TODO: for all of these adjustable weights, put them into JSON!!
-    public Region generateForestRegion(Location start, int maxX, int maxY, boolean withPlayer) {
+    public Region generateForestRegion(Location start, int maxX, int maxY) {
 
-        // TODO: make static OR add noise
-        Map<Double, Entity> entitiesByWeight = new HashMap<>();
-        entitiesByWeight.put(0.69, Entities.GRASS);
-        entitiesByWeight.put(0.20, Entities.TREE);
-        entitiesByWeight.put(0.06, Entities.DIRT);
-        entitiesByWeight.put(0.05, Entities.PUDDLE);
+        // TODO: make static OR add noise, ditch the numberNames
+        Map<Double, Entity> layerZeroEntitiesByWeight = new HashMap<>();
+        layerZeroEntitiesByWeight.put(0.75, Entities.GRASS);
+        layerZeroEntitiesByWeight.put(0.20, Entities.DIRT);
+        layerZeroEntitiesByWeight.put(0.05, Entities.PUDDLE);
 
-        return generateRegion(start, maxX, maxY, entitiesByWeight, false, withPlayer);
+        Map<Double, Entity> layerOneEntitiesByWeight = new HashMap<>();
+
+        layerOneEntitiesByWeight.put(0.91, null);
+        layerOneEntitiesByWeight.put(0.06, Entities.TREE);
+        layerOneEntitiesByWeight.put(MONSTER_RAND_WEIGHT, Entities.MONSTER);
+        layerOneEntitiesByWeight.put(PLAYER_RAND_WEIGHT, Entities.PLAYER);
+
+        List<Map<Double, Entity>> entityLayers = new ArrayList<>();
+        entityLayers.add(layerZeroEntitiesByWeight);
+        entityLayers.add(layerOneEntitiesByWeight);
+        return generateRegion(start, maxX, maxY, entityLayers, false);
     }
 
-    public Region generateFieldRegion(Location start, int maxX, int maxY, boolean withPlayer) {
+    public Region generateFieldRegion(Location start, int maxX, int maxY) {
 
-        // TODO: make static OR add noise
-        Map<Double, Entity> entitiesByWeight = new HashMap<>();
-        entitiesByWeight.put(0.82, Entities.GRASS);
-        entitiesByWeight.put(0.07, Entities.TREE);
-        entitiesByWeight.put(0.06, Entities.DIRT);
-        entitiesByWeight.put(0.05, Entities.PUDDLE);
+        // TODO: make static OR add noise, ditch the numberNames
+        Map<Double, Entity> layerZeroEntitiesByWeight = new HashMap<>();
+        layerZeroEntitiesByWeight.put(0.85, Entities.GRASS);
+        layerZeroEntitiesByWeight.put(0.10, Entities.DIRT);
+        layerZeroEntitiesByWeight.put(0.05, Entities.PUDDLE);
 
-        return generateRegion(start, maxX, maxY, entitiesByWeight, false, withPlayer);
+        Map<Double, Entity> layerOneEntitiesByWeight = new HashMap<>();
+
+        layerOneEntitiesByWeight.put(0.95, null);
+        layerOneEntitiesByWeight.put(0.02, Entities.TREE);
+        layerOneEntitiesByWeight.put(MONSTER_RAND_WEIGHT, Entities.MONSTER);
+        layerOneEntitiesByWeight.put(PLAYER_RAND_WEIGHT, Entities.PLAYER);
+
+        List<Map<Double, Entity>> entityLayers = new ArrayList<>();
+        entityLayers.add(layerZeroEntitiesByWeight);
+        entityLayers.add(layerOneEntitiesByWeight);
+        return generateRegion(start, maxX, maxY, entityLayers, false);
     }
 
-    public Region generateSwampRegion(Location start, int maxX, int maxY, boolean withPlayer) {
+    public Region generateSwampRegion(Location start, int maxX, int maxY) {
 
-        // TODO: make static OR add noise
-        Map<Double, Entity> entitiesByWeight = new HashMap<>();
-        entitiesByWeight.put(0.40, Entities.PUDDLE);
-        entitiesByWeight.put(0.35, Entities.GRASS);
-        entitiesByWeight.put(0.20, Entities.DIRT);
-        entitiesByWeight.put(0.05, Entities.TREE);
+        // TODO: make static OR add noise, ditch the numberNames
+        Map<Double, Entity> layerZeroEntitiesByWeight = new HashMap<>();
+        layerZeroEntitiesByWeight.put(0.35, Entities.GRASS);
+        layerZeroEntitiesByWeight.put(0.25, Entities.DIRT);
+        layerZeroEntitiesByWeight.put(0.40, Entities.PUDDLE);
 
-        return generateRegion(start, maxX, maxY, entitiesByWeight, false, withPlayer);
+        Map<Double, Entity> layerOneEntitiesByWeight = new HashMap<>();
+
+        layerOneEntitiesByWeight.put(0.92, null);
+        layerOneEntitiesByWeight.put(0.05, Entities.TREE);
+        layerOneEntitiesByWeight.put(MONSTER_RAND_WEIGHT, Entities.MONSTER);
+        layerOneEntitiesByWeight.put(PLAYER_RAND_WEIGHT, Entities.PLAYER);
+
+        List<Map<Double, Entity>> entityLayers = new ArrayList<>();
+        entityLayers.add(layerZeroEntitiesByWeight);
+        entityLayers.add(layerOneEntitiesByWeight);
+        return generateRegion(start, maxX, maxY, entityLayers, false);
     }
 
-    public Region generateCity(Location start, int maxX, int maxY, boolean withPlayer) {
+    public Region generateCity(Location start, int maxX, int maxY) {
 
-        // TODO: make static OR add noise
-        Map<Double, Entity> entitiesByWeight = new HashMap<>();
-        entitiesByWeight.put(0.82, Entities.GRASS);
-        entitiesByWeight.put(0.07, Entities.TREE);
-        entitiesByWeight.put(0.06, Entities.DIRT);
-        entitiesByWeight.put(0.05, Entities.PUDDLE);
+        // TODO: make static OR add noise, ditch the numberNames
+        Map<Double, Entity> layerZeroEntitiesByWeight = new HashMap<>();
+        layerZeroEntitiesByWeight.put(0.89, Entities.GRASS);
+        layerZeroEntitiesByWeight.put(0.06, Entities.DIRT);
+        layerZeroEntitiesByWeight.put(0.05, Entities.PUDDLE);
 
-        return generateRegion(start, maxX, maxY, entitiesByWeight, true, withPlayer);
+        Map<Double, Entity> layerOneEntitiesByWeight = new HashMap<>();
+
+        layerOneEntitiesByWeight.put(0.90, null);
+        layerOneEntitiesByWeight.put(0.07, Entities.TREE);
+        layerOneEntitiesByWeight.put(MONSTER_RAND_WEIGHT, Entities.MONSTER);
+        layerOneEntitiesByWeight.put(PLAYER_RAND_WEIGHT, Entities.PLAYER);
+
+        List<Map<Double, Entity>> entityLayers = new ArrayList<>();
+        entityLayers.add(layerZeroEntitiesByWeight);
+        entityLayers.add(layerOneEntitiesByWeight);
+        return generateRegion(start, maxX, maxY, entityLayers, true);
+    }
+
+    // TODO: I believe this is bad - it clobbers a location vs "melding" with it.
+    private Region smooth(Region region, Location start, int maxX, int maxY,
+            List<Location> availablePlayerLocations,
+            Map<Location, Set<Entity>> cityEntitiesByLocation,
+            List<Map<Double, Entity>> entityWeightByLayers) {
+
+        Region newRegion = new Region();
+
+        for (int y = 0; y < maxY; y++) {
+            for (int x = 0; x < maxX; x++) {
+
+                // Don't use this to add to the region, it's always zero based.
+                Location location = Location.create(x, y);
+
+                // Location in grid is zero based. So create an offset location
+                // for adding to the actual region.
+                Location regionOffsetLoc = Location.create(
+                        location.getX() + start.getX(),
+                        location.getY() + start.getY());
+
+                Set<Entity> entities = cityEntitiesByLocation.get(location);
+                if (entities != null) {
+                    for (Entity entity : entities) {
+                        newRegion = newRegion.add(entity, regionOffsetLoc);
+                    }
+                } else {
+                    final Region finalOrigRegion = region;
+
+                    // Skew the random weights by nearby locations to have
+                    // a smoothing concept
+                    // Note: searching the original region because it acts like a diagram
+                    // but we want to generate a new one.
+                    Set<Location> neighbors = location.getNeighbors();
+                    Map<String, List<Entity>> neighborEntitiesByName = neighbors.stream()
+                            .map(l -> finalOrigRegion.get(l, 0))
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.groupingBy(Entity::getName));
+
+                    for (int layerIdx = 0; layerIdx < entityWeightByLayers.size(); layerIdx++) {
+
+                        RandomCollection<Entity> smoothedRandomCollection = new RandomCollection<>();
+
+                        entityWeightByLayers.get(layerIdx).forEach((k, v) -> {
+                            double weight = k;
+                            // value (ie weight) as null is used to signify: do nothing
+                            if (v != null) {
+                                List<Entity> ents = neighborEntitiesByName.get(v.getName());
+                                weight = ents != null ? k * ents.size() : k;
+                            }
+                            smoothedRandomCollection.add(weight, v);
+                        });
+
+                        Entity entity = smoothedRandomCollection.next();
+
+                        if (entity != null) {
+                            // yucky special case
+                            if (entity.equals(Entities.MONSTER)) {
+                                entity = Entities.createMonster(
+                                        FamilyTreeGenerator.create().getName().toString());
+                            }
+                            newRegion = newRegion.add(entity, regionOffsetLoc);
+
+                            // check if players can't visit
+                            if (entity.getAttributes(CommonAttributes.IMPASSABLE.name()).isEmpty()) {
+                                availablePlayerLocations.add(regionOffsetLoc);
+                            } else {
+                                availablePlayerLocations.remove(regionOffsetLoc);
+                            }
+                        }
+                    } // FOR layerIdx
+                }
+            }
+        }
+
+        return newRegion;
     }
 
     // boolean withPlayer - hack for now
     private Region generateRegion(Location start, int maxX, int maxY,
-            Map<Double, Entity> entitiesByWeight, boolean fillCity, boolean withPlayer) {
+            List<Map<Double, Entity>> entityLayers, boolean fillCity) {
 
         Region region = new Region();
 
@@ -141,68 +259,15 @@ public class RegionHelper {
         }
 
         List<Location> availablePlayerLocations = new ArrayList<>();
-        Random rand = new Random();
-        RandomCollection<Entity> randomCollection = new RandomCollection<>();
 
-        entitiesByWeight.forEach((k, v) -> {
-            randomCollection.add(k, v);
-        });
+        for (int i = 0; i < 10; i++) {
+            availablePlayerLocations.clear();
 
-        for (int y = 0; y < maxY; y++) {
-            for (int x = 0; x < maxX; x++) {
-
-                // Don't use this to add to the region, it's always zero based.
-                Location location = Location.create(x, y);
-
-                // Location in grid is zero based. So create an offset location
-                // for adding to the actual region.
-                Location regionOffsetLoc = Location.create(
-                        location.getX() + start.getX(),
-                        location.getY() + start.getY());
-
-                Set<Entity> entities = cityEntitiesByLocation.get(location);
-                if (entities != null) {
-                    for (Entity entity : entities) {
-                        region = region.add(entity, regionOffsetLoc);
-                    }
-                } else {
-                    Entity entity = randomCollection.next();
-                    region = region.add(entity, regionOffsetLoc);
-                    availablePlayerLocations.add(regionOffsetLoc);
-
-                    // TBD: how to handle monsters??
-                    // TBD: how to layer???
-                    Entity optionalEntity = null;
-//                    if (random > 0.99) {
-//                        optionalEntity = Entities.createMonster(
-//                                FamilyTreeGenerator.create().getName().toString());
-//                    }
-
-                    if (optionalEntity != null) {
-                        if (!optionalEntity.getAttributes(CommonAttributes.IMPASSABLE.name()).isEmpty()) {
-                            availablePlayerLocations.remove(regionOffsetLoc);
-                        }
-                        region = region.add(optionalEntity, regionOffsetLoc);
-                    }
-                }
-            }
-        }
-
-        if (withPlayer) {
-            int randomLocation = rand.nextInt(availablePlayerLocations.size());
-            Location randomPlayerLoc = availablePlayerLocations.get(randomLocation);
-            region = region.add(Entities.PLAYER, randomPlayerLoc);
+            region = smooth(region, start, maxX, maxY,
+                    availablePlayerLocations, cityEntitiesByLocation, entityLayers);
         }
 
         return region;
-    }
-
-    // TBD: could move out
-    private enum Terrain {
-        CITY,
-        FIELD,
-        FOREST,
-        SWAMP
     }
 
     // Main method to generate random terrain regions
@@ -215,18 +280,50 @@ public class RegionHelper {
         randomTerrain.add(0.20, Terrain.FOREST);
         randomTerrain.add(0.10, Terrain.SWAMP);
 
+        Region region = null;
+
         switch (randomTerrain.next()) {
             case CITY:
-                return generateCity(start, maxX, maxY, withPlayer);
+                region = generateCity(start, maxX, maxY);
+                break;
             case FIELD:
-                return generateFieldRegion(start, maxX, maxY, withPlayer);
+                region = generateFieldRegion(start, maxX, maxY);
+                break;
             case FOREST:
-                return generateForestRegion(start, maxX, maxY, withPlayer);
+                region = generateForestRegion(start, maxX, maxY);
+                break;
             case SWAMP:
-                return generateSwampRegion(start, maxX, maxY, withPlayer);
+                region = generateSwampRegion(start, maxX, maxY);
+                break;
         }
 
-        return null;
+        Objects.requireNonNull(region);
+
+        Set<Location> removePlayers = new HashSet<>();
+        if (withPlayer) {
+            // TBD: this is a mild hack, removing the extra player entities after
+            // all the initial regions are generated.
+            removePlayers.addAll(region.find(Entities.PLAYER).stream()
+                    .skip(1)
+                    .collect(Collectors.toSet()));
+        } else {
+            removePlayers.addAll(region.find(Entities.PLAYER).stream()
+                    .collect(Collectors.toSet()));
+        }
+        for (Location removePlayerLoc : removePlayers) {
+            region = region.remove(Entities.PLAYER, removePlayerLoc);
+        }
+        if (withPlayer) {
+            if (region.find(Entities.PLAYER).size() != 1) {
+                throw new RuntimeException("Number of players is wrong");
+            }
+        } else {
+            if (!region.find(Entities.PLAYER).isEmpty()) {
+                throw new RuntimeException("Player generated");
+            }
+        }
+
+        return Objects.requireNonNull(region);
     }
 
     private static class CityGenerator extends DungeonGenerator {
@@ -311,6 +408,11 @@ public class RegionHelper {
             if (weight <= 0) {
                 return this;
             }
+
+            if (map.containsKey(weight)) {
+                return add(weight + random.nextDouble(), result);
+            }
+
             total += weight;
             map.put(total, result);
             return this;

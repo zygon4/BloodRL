@@ -101,7 +101,7 @@ public class SimpleAI implements GameSystem {
 
         // TODO: needs detailed terrain/heights to block entities
         // TODO: open/interact with terrain such as doors
-        Set<Entity> entities = region.get(destination);
+        List<Entity> entities = region.get(destination);
         if (entities.stream()
                 .filter(e -> !e.getAttributes(CommonAttributes.IMPASSABLE.name()).isEmpty())
                 .findAny().isPresent()) {

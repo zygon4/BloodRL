@@ -42,7 +42,7 @@ public class GameScreen extends ScreenAdapter {
 
         music = Gdx.audio.newMusic(Gdx.files.internal("media/Punch Deck - Oppressive Ambiance.wav"));
         music.setLooping(true);
-        music.setVolume(0.10f);
+        music.setVolume(0.05f);
         music.play();
 
         camera = new OrthographicCamera(w, h);

@@ -4,8 +4,8 @@ import com.zygon.rl.core.model.Entity;
 import com.zygon.rl.core.model.Location;
 import com.zygon.rl.core.model.Region;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  */
@@ -37,7 +37,7 @@ public class RegionView {
      * @return the Set of Entity's that reside at the desired location FROM THE
      * USER'S PERSPECTIVE.
      */
-    public Set<Entity> get(Location viewLocation, Location viewCenter) {
+    public List<Entity> get(Location viewLocation, Location viewCenter) {
 
         int xDistanceFromCenter = viewCenter.getX() - viewLocation.getX();
         int yDistanceFromCenter = viewCenter.getY() - viewLocation.getY();

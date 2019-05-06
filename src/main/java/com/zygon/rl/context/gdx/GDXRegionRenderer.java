@@ -107,7 +107,7 @@ class GDXRegionRenderer extends GDXComponent {
 
                 Location viewLocation = Location.create(viewWidthIdx, viewHeightIdx);
 
-                Set<Entity> entities = regionView.get(viewLocation, viewCenter);
+                List<Entity> entities = regionView.get(viewLocation, viewCenter);
                 if (!entities.isEmpty()) {
 
                     char symbol = ' ';
@@ -187,7 +187,7 @@ class GDXRegionRenderer extends GDXComponent {
                 .orElse(0.0);
     }
 
-    private List<Entity> sortViewBlockingEntity(Set<Entity> entities) {
+    private List<Entity> sortViewBlockingEntity(List<Entity> entities) {
         return entities.stream()
                 .sorted((e1, e2) -> {
                     Set<Attribute> vb1 = e1.getAttributes(CommonAttributes.VIEW_BLOCK.name());

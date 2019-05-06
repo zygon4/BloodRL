@@ -2,6 +2,7 @@ package com.zygon.rl.core.model;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -80,7 +81,7 @@ public class Regions {
         return find(entity.getName());
     }
 
-    public Set<Entity> get(Location location) {
+    public List<Entity> get(Location location) {
         return getRegion(location).get(location);
     }
 
@@ -123,7 +124,7 @@ public class Regions {
         int localStartY = startLocation.getY();
         int localStripWidth = Math.min(startRegion.getMaxValues().getX() - localStartX + 1, Math.min(width, REGION_EDGE_SIZE));
         int localStripHeight = Math.min(startRegion.getMaxValues().getY() - localStartY + 1, Math.min(height, REGION_EDGE_SIZE));
-        Map<Location, Set<Entity>> outEntitiesByLocation = new HashMap<>();
+        Map<Location, List<Entity>> outEntitiesByLocation = new HashMap<>();
 
         add(outEntitiesByLocation, regionView, startRegion,
                 localStartX, localStartY, localStripWidth, localStripHeight);
@@ -240,14 +241,14 @@ public class Regions {
         return new Regions(regions, minValues, maxValues);
     }
 
-    private void add(Map<Location, Set<Entity>> outEntitiesByLocation,
+    private void add(Map<Location, List<Entity>> outEntitiesByLocation,
             Region toRegion, Region fromRegion, int startX, int startY, int stripWidth, int stripHeight) {
 
         for (int y = startY; y < startY + stripHeight; y++) {
             for (int x = startX; x < startX + stripWidth; x++) {
                 Location l = Location.create(x, y);
 
-                Set<Entity> entities = fromRegion.get(l);
+                List<Entity> entities = fromRegion.get(l);
                 toRegion = toRegion.add(entities, l);
                 outEntitiesByLocation.put(l, entities);
             }

@@ -7,9 +7,11 @@
  */
 package com.zygon.rl.core.model;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -25,13 +27,13 @@ public final class Region {
     static final Location DEFAULT_MAX_LOCATION = Location.create(
             Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
 
-    private final Map<Location, Set<Entity>> entitiesByLocation;
+    private final Map<Location, List<Entity>> entitiesByLocation;
     private final Map<Entity, Set<Location>> locationsByEntity;
 
     private final Location minValues;
     private final Location maxValues;
 
-    private Region(Map<Location, Set<Entity>> entitiesByLocation,
+    private Region(Map<Location, List<Entity>> entitiesByLocation,
             Map<Entity, Set<Location>> locationByentity,
             Location minValues, Location maxValues) {
 //        this.entitiesByLocation = Collections.unmodifiableMap(entitiesByLocation);
@@ -75,10 +77,10 @@ public final class Region {
     }
 
     // No longer immutable :(
-    public Region add(Map<Location, Set<Entity>> newEntitiesByLocation) {
+    public Region add(Map<Location, List<Entity>> newEntitiesByLocation) {
         // Add to loc -> entity mapping
 //        Map<Location, Set<Entity>> entsByLoc = new ConcurrentHashMap<>();
-        Map<Location, Set<Entity>> entsByLoc = entitiesByLocation;
+        Map<Location, List<Entity>> entsByLoc = entitiesByLocation;
 
 //        entitiesByLocation.entrySet().parallelStream()
 //                .forEach(entry -> {
@@ -87,9 +89,9 @@ public final class Region {
         newEntitiesByLocation.entrySet().parallelStream()
                 .forEach(entry -> {
                     Location location = entry.getKey();
-                    Set<Entity> ents = entsByLoc.get(location);
+                    List<Entity> ents = entsByLoc.get(location);
                     if (ents == null) {
-                        ents = new HashSet<>();
+                        ents = new ArrayList<>();
                         entsByLoc.put(location, ents);
                     }
                     ents.addAll(entry.getValue());
@@ -106,7 +108,7 @@ public final class Region {
         Location newMin = null;
         Location newMax = null;
 
-        for (Map.Entry<Location, Set<Entity>> entry : newEntitiesByLocation.entrySet()) {
+        for (Map.Entry<Location, List<Entity>> entry : newEntitiesByLocation.entrySet()) {
             Location location = entry.getKey();
             entry.getValue().forEach(entity -> {
                 Set<Location> entityLocs = locByEntity.get(entity);
@@ -124,12 +126,12 @@ public final class Region {
         return new Region(entsByLoc, locByEntity, newMin, newMax);
     }
 
-    public Region add(Set<Entity> entities, Location location) {
+    public Region add(List<Entity> entities, Location location) {
         return add(Collections.singletonMap(location, entities));
     }
 
     public Region add(Entity entity, Location location) {
-        return add(Collections.singleton(entity), location);
+        return add(Collections.singletonList(entity), location);
     }
 
     public boolean contains(Location location) {
@@ -137,9 +139,14 @@ public final class Region {
                 && location.getY() >= minValues.getY() && location.getY() <= maxValues.getY();
     }
 
-    public Set<Entity> get(Location location) {
-        Set<Entity> entities = entitiesByLocation.get(location);
-        return entities == null ? Collections.emptySet() : Collections.unmodifiableSet(entities);
+    public List<Entity> get(Location location) {
+        List<Entity> entities = entitiesByLocation.get(location);
+        return entities == null ? Collections.emptyList() : Collections.unmodifiableList(entities);
+    }
+
+    public Entity get(Location location, int layer) {
+        List<Entity> entities = entitiesByLocation.get(location);
+        return entities == null ? null : entities.get(layer);
     }
 
     public int getHeight() {
@@ -166,16 +173,26 @@ public final class Region {
 
     public Region remove(Entity entity, Location location) {
         // Remove from loc -> entity mapping
-        Map<Location, Set<Entity>> entsByLoc = new HashMap<>(entitiesByLocation);
-        Set<Entity> ents = entsByLoc.get(location);
+        Map<Location, List<Entity>> entsByLoc = new HashMap<>(entitiesByLocation);
+        List<Entity> ents = entsByLoc.get(location);
 
         if (ents != null) {
-            ents.remove(entity);
+            ents = ents.stream()
+                    .filter(ent -> !ent.equals(entity))
+                    .collect(Collectors.toList());
+
+            entsByLoc.put(location, ents);
         }
 
         // Remove from entity -> loc mapping
         Map<Entity, Set<Location>> locByEntity = new HashMap<>(locationsByEntity);
-        locByEntity.remove(entity);
+        Set<Location> locationsForEntity = locByEntity.get(entity);
+        if (locationsForEntity != null) {
+            locationsForEntity.remove(location);
+            if (locationsForEntity.isEmpty()) {
+                locByEntity.remove(entity);
+            }
+        }
 
         Location newMin = getMin(minValues, location);
         Location newMax = getMax(maxValues, location);
