@@ -4,7 +4,7 @@ Beginnings of a kitchen-sink vampire Roguelike:
 ![Alt text](/images/BloodRL1.png?raw=true "Blood")
 
 Features: 
-* Infinite scroll map generation (RNG is rough though)
+* Infinite scroll map generation
 * Shadowcasting
 * Openable/closeable doors&windows
 * Simple wandering "monsters" (no way to interact yet)
