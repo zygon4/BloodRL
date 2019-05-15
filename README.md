@@ -2,6 +2,7 @@
 Beginnings of a kitchen-sink vampire Roguelike:
 
 ![Alt text](/images/BloodRL3.png?raw=true "Blood")
+![Alt text](/images/BloodRL4.png?raw=true "Blood")
 
 Features: 
 * Infinite scroll map generation
