@@ -43,6 +43,8 @@ public class BloodGame extends Game {
         Regions regions = Regions.create();
 
         // This creates the initial map
+        // TBD: I think when the world goes fullscreen that it messes with the "grow" algorithm
+        // which is causing a crash/NPE
         for (int y = 0; y < 400; y += 20) {
             for (int x = 0; x < 400; x += 20) {
                 Location loc = Location.create(x, y);

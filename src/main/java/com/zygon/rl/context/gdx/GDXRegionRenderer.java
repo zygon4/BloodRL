@@ -9,12 +9,10 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.Align;
 import com.stewsters.util.shadow.twoDimention.LitMap2d;
 import com.stewsters.util.shadow.twoDimention.ShadowCaster2d;
-import com.zygon.rl.common.model.CommonAttributes;
 import com.zygon.rl.common.model.Tile;
 import com.zygon.rl.common.view.FOVHelper;
 import com.zygon.rl.common.view.RegionView;
 import com.zygon.rl.core.model.Attribute;
-import com.zygon.rl.core.model.DoubleAttribute;
 import com.zygon.rl.core.model.Entity;
 import com.zygon.rl.core.model.Game;
 import com.zygon.rl.core.model.Location;
@@ -179,26 +177,9 @@ class GDXRegionRenderer extends GDXComponent {
         return regions.getView(bullshitLoc, viewWidthMax, viewHeightMax);
     }
 
-    private static final String VIEW_BLOCK_NAME = CommonAttributes.VIEW_BLOCK.name();
-
-    private static double getMaxViewBlock(Entity entity) {
-
-        double max = 0.0;
-        Set<Attribute> viewBlocking = entity.getAttributes(VIEW_BLOCK_NAME);
-
-        for (Attribute attr : viewBlocking) {
-            double attrVal = DoubleAttribute.getValue(attr);
-            if (attrVal > max) {
-                max = attrVal;
-            }
-        }
-
-        return max;
-    }
-
     private static final Comparator<Entity> ENTITY_COMPARE = (e1, e2) -> {
-        Set<Attribute> vb1 = e1.getAttributes(VIEW_BLOCK_NAME);
-        Set<Attribute> vb2 = e2.getAttributes(VIEW_BLOCK_NAME);
+        Set<Attribute> vb1 = e1.getAttributes(FOVHelper.VIEW_BLOCK_NAME);
+        Set<Attribute> vb2 = e2.getAttributes(FOVHelper.VIEW_BLOCK_NAME);
 
         if (vb1 != null && vb2 == null) {
             return -1;
@@ -210,8 +191,8 @@ class GDXRegionRenderer extends GDXComponent {
 
         // Both entities have view blocking, sort by which entity
         // has the highest view-blocking entity
-        double e1MaxViewBlock = getMaxViewBlock(e1);
-        double e2MaxViewBlock = getMaxViewBlock(e2);
+        double e1MaxViewBlock = FOVHelper.getMaxViewBlock(e1);
+        double e2MaxViewBlock = FOVHelper.getMaxViewBlock(e2);
         return e1MaxViewBlock > e2MaxViewBlock
                 ? -1 : (e1MaxViewBlock < e2MaxViewBlock ? 1 : 0);
     };

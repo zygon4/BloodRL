@@ -6,18 +6,22 @@
 package com.zygon.rl.common.view;
 
 import com.zygon.rl.common.model.CommonAttributes;
+import com.zygon.rl.core.model.Attribute;
 import com.zygon.rl.core.model.DoubleAttribute;
 import com.zygon.rl.core.model.Entity;
 import com.zygon.rl.core.model.Location;
 import com.zygon.rl.core.model.Region;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  *
  * @author zygon
  */
 public class FOVHelper {
+
+    public static final String VIEW_BLOCK_NAME = CommonAttributes.VIEW_BLOCK.name();
 
     public float[][] generateSimpleResistances(Region region) {
 
@@ -34,16 +38,8 @@ public class FOVHelper {
                 // TBD: "view blocking" as first attempt at light layering
                 // Note this should be parallelStream(), but the runtime kept crashing inexplicably
                 double viewBlocking = entities.stream()
-                        .map(e -> e.getAttributes(CommonAttributes.VIEW_BLOCK.name()))
-                        .map(a -> {
-                            return a.stream()
-                                    .map(DoubleAttribute::create)
-                                    .map(DoubleAttribute::getDoubleValue)
-                                    .mapToDouble(v -> v)
-                                    .max().orElseGet(() -> 0.0);
-                        })
-                        .mapToDouble(v -> v)
-                        .max().orElseGet(() -> 0.0);
+                        .mapToDouble(FOVHelper::getMaxViewBlock)
+                        .max().orElse(0.0);
 
                 try {
                     portion[x - minValues.getX()][y - minValues.getY()] = (float) viewBlocking;
@@ -54,5 +50,20 @@ public class FOVHelper {
         }
 
         return portion;
+    }
+
+    public static double getMaxViewBlock(Entity entity) {
+
+        double max = 0.0;
+        Set<Attribute> viewBlocking = entity.getAttributes(VIEW_BLOCK_NAME);
+
+        for (Attribute attr : viewBlocking) {
+            double attrVal = DoubleAttribute.getValue(attr);
+            if (attrVal > max) {
+                max = attrVal;
+            }
+        }
+
+        return max;
     }
 }
