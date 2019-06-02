@@ -15,7 +15,7 @@ public class DoubleAttribute extends Attribute {
 
     private DoubleAttribute(Attribute attribute) {
         super(attribute.copy());
-        this.value = Double.valueOf(attribute.getValue());
+        this.value = getValue(attribute);
     }
 
     public static DoubleAttribute create(Attribute attribute) {
@@ -24,5 +24,9 @@ public class DoubleAttribute extends Attribute {
 
     public double getDoubleValue() {
         return value;
+    }
+
+    public static double getValue(Attribute attribute) {
+        return Double.valueOf(attribute.getValue());
     }
 }

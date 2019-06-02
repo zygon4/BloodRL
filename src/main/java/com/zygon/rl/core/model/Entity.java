@@ -54,9 +54,16 @@ public class Entity {
     }
 
     public Set<Attribute> getAttributes(String name) {
-        return attributes.stream()
-                .filter(a -> a.getName().equals(name))
-                .collect(Collectors.toSet());
+
+        Set<Attribute> attrs = new HashSet<>();
+
+        for (Attribute attr : attributes) {
+            if (attr.getName().equals(name)) {
+                attrs.add(attr);
+            }
+        }
+
+        return attrs;
     }
 
     public String getAttributeValue(String name) {
