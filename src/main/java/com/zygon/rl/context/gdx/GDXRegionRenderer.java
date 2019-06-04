@@ -153,7 +153,8 @@ class GDXRegionRenderer extends GDXComponent {
     }
 
     // REMEMBER! maxWidthPixels/maxHeightPixels are the DISPLAY coords, NOTHING to do with the REGION
-    private Region createDisplayRegion(Game game, Location withRespectTo, int maxWidthPixels, int maxHeightPixels) {
+    private Region createDisplayRegion(Game game, Location withRespectTo,
+            int maxWidthPixels, int maxHeightPixels) {
 
         Regions regions = game.getRegions();
 
@@ -169,12 +170,12 @@ class GDXRegionRenderer extends GDXComponent {
         int spacesX = (maxWidthPixels / 2) / fontBuffer;
         int spacesY = (maxHeightPixels / 2) / fontBuffer;
 
-        Location bullshitLoc = Location.create(wrtX - spacesX, wrtY - spacesY);
+        Location startLoc = Location.create(wrtX - spacesX, wrtY - spacesY);
 
         int viewWidthMax = maxWidthPixels / fontBuffer;
         int viewHeightMax = maxHeightPixels / fontBuffer;
 
-        return regions.getView(bullshitLoc, viewWidthMax, viewHeightMax);
+        return regions.getView(startLoc, viewWidthMax, viewHeightMax);
     }
 
     private static final Comparator<Entity> ENTITY_COMPARE = (e1, e2) -> {
