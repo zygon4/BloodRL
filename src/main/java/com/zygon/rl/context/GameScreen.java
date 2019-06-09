@@ -29,6 +29,7 @@ public class GameScreen extends ScreenAdapter {
     private SpriteBatch spriteBatch;
     private OrthographicCamera camera;
     private Music music;
+    private boolean dirtyGame = true;
 
     GameScreen(Supplier<Game> gameSupplier, Consumer<Game> gameConsumer) {
         this.gameSupplier = gameSupplier;
@@ -73,21 +74,24 @@ public class GameScreen extends ScreenAdapter {
             music.setVolume(music.getVolume() - .05f);
         }
 
-        Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        if (dirtyGame) {
+            Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        camera.update();
+            camera.update();
 
-        spriteBatch.setProjectionMatrix(camera.combined);
+            spriteBatch.setProjectionMatrix(camera.combined);
 
-        spriteBatch.begin();
-        gameRenderer.render(gameSupplier.get());
-        spriteBatch.end();
+            spriteBatch.begin();
+            gameRenderer.render(gameSupplier.get());
+            spriteBatch.end();
 
-        Gdx.gl.glDisable(GL20.GL_BLEND);
+            Gdx.gl.glDisable(GL20.GL_BLEND);
 
+            dirtyGame = false;
+        }
         // This will update the game state
         processInput();
     }
@@ -107,11 +111,14 @@ public class GameScreen extends ScreenAdapter {
         Game game = gameSupplier.get();
 
         com.zygon.rl.core.model.Input input = game.getInputSupplier().get();
-        com.zygon.rl.core.model.Action action = gameController.convertInput(gameSupplier.get(), input);
-        if (action != null) {
-            gameConsumer.accept(gameController.handleAction(gameSupplier.get(), action));
-        } else {
-            gameConsumer.accept(gameController.handleInvalidInput(gameSupplier.get(), input));
+        if (!input.isUnknown()) {
+            com.zygon.rl.core.model.Action action = gameController.convertInput(gameSupplier.get(), input);
+            if (action != null) {
+                gameConsumer.accept(gameController.handleAction(gameSupplier.get(), action));
+            } else {
+                gameConsumer.accept(gameController.handleInvalidInput(gameSupplier.get(), input));
+            }
+            dirtyGame = true;
         }
     }
 }

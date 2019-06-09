@@ -11,8 +11,10 @@ package com.zygon.rl.core.model;
  */
 public class Input {
 
+    public static int UNKNOWN_INPUT = -1;
+
     public static Input getUnknown() {
-        return new Input(-1);
+        return new Input(UNKNOWN_INPUT);
     }
 
     // So input shouldn't have a character, it should TAKE a
@@ -29,6 +31,10 @@ public class Input {
 
     public int getInput() {
         return input;
+    }
+
+    public boolean isUnknown() {
+        return getInput() == UNKNOWN_INPUT;
     }
 
     @Override
