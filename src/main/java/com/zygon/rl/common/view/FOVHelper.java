@@ -36,10 +36,13 @@ public class FOVHelper {
                 List<Entity> entities = region.get(Location.create(x, y));
 
                 // TBD: "view blocking" as first attempt at light layering
-                // Note this should be parallelStream(), but the runtime kept crashing inexplicably
-                double viewBlocking = entities.stream()
-                        .mapToDouble(FOVHelper::getMaxViewBlock)
-                        .max().orElse(0.0);
+                double viewBlocking = 0.0;
+                for (Entity entity : entities) {
+                    double val = FOVHelper.getMaxViewBlock(entity);
+                    if (val > viewBlocking) {
+                        viewBlocking = val;
+                    }
+                }
 
                 try {
                     portion[x - minValues.getX()][y - minValues.getY()] = (float) viewBlocking;
