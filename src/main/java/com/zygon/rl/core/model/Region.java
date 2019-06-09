@@ -36,8 +36,6 @@ public final class Region {
     private Region(Map<Location, List<Entity>> entitiesByLocation,
             Map<Entity, Set<Location>> locationByentity,
             Location minValues, Location maxValues) {
-//        this.entitiesByLocation = Collections.unmodifiableMap(entitiesByLocation);
-//        this.locationsByEntity = Collections.unmodifiableMap(locationByentity);
 
         // TBD: mutable, ick
         this.entitiesByLocation = entitiesByLocation;
@@ -48,7 +46,6 @@ public final class Region {
     }
 
     public Region() {
-//        this(Collections.emptyMap(), Collections.emptyMap(), DEFAULT_MIN_LOCATION, DEFAULT_MAX_LOCATION);
         this(new HashMap<>(), new HashMap<>(), DEFAULT_MIN_LOCATION, DEFAULT_MAX_LOCATION);
     }
 
@@ -79,13 +76,8 @@ public final class Region {
     // No longer immutable :(
     public Region add(Map<Location, List<Entity>> newEntitiesByLocation) {
         // Add to loc -> entity mapping
-//        Map<Location, Set<Entity>> entsByLoc = new ConcurrentHashMap<>();
         Map<Location, List<Entity>> entsByLoc = entitiesByLocation;
 
-//        entitiesByLocation.entrySet().parallelStream()
-//                .forEach(entry -> {
-//                    entsByLoc.put(entry.getKey(), entry.getValue());
-//                });
         newEntitiesByLocation.entrySet().parallelStream()
                 .forEach(entry -> {
                     Location location = entry.getKey();
@@ -98,12 +90,7 @@ public final class Region {
                 });
 
         // Add to entity -> loc mapping
-//        Map<Entity, Set<Location>> locByEntity = new ConcurrentHashMap<>();
         Map<Entity, Set<Location>> locByEntity = locationsByEntity;
-//        locationsByEntity.entrySet().parallelStream()
-//                .forEach(entry -> {
-//                    locByEntity.put(entry.getKey(), entry.getValue());
-//                });
 
         Location newMin = null;
         Location newMax = null;
