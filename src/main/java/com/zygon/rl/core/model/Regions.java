@@ -2,11 +2,11 @@ package com.zygon.rl.core.model;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -62,11 +62,16 @@ public class Regions {
     }
 
     public Set<Location> find(String entityName, Function<Location, Boolean> entityFilter) {
-        return regionsByLocation.values().parallelStream()
-                .map(r -> r.find(entityName))
-                .flatMap(s -> s.parallelStream())
-                .filter(loc -> entityFilter.apply(loc))
-                .collect(Collectors.toSet());
+        Set<Location> finds = new HashSet<>();
+        for (Region region : regionsByLocation.values()) {
+            Set<Location> regionFinds = region.find(entityName);
+            for (Location regionFind : regionFinds) {
+                if (entityFilter.apply(regionFind)) {
+                    finds.add(regionFind);
+                }
+            }
+        }
+        return finds;
     }
 
     public Set<Location> find(String entityName) {
@@ -95,12 +100,16 @@ public class Regions {
 
     public Region getRegion(Location location) {
         // TODO: could have this indexed, would be faster
-        return regionsByLocation.entrySet().parallelStream()
-                .filter(e -> e.getValue().contains(location))
-                .map(e -> e.getValue())
-                .findAny().orElse(null);
+        for (Region region : regionsByLocation.values()) {
+            if (region.contains(location)) {
+                return region;
+            }
+        }
+
+        return null;
     }
 
+    @Deprecated // Not used anymore, will go away
     public Region getView(Location startLocation, int width, int height) {
         Region regionView = new Region();
 
@@ -109,6 +118,7 @@ public class Regions {
 
     // Returns a possibly stitched together region from different surrounding regions, depending
     // on where the location is.
+    @Deprecated // Not used anymore, will go away
     private Region getView(Location startLocation, int width, int height, Region regionView) {
 
         if (width == 0 && height == 0) {
@@ -196,20 +206,28 @@ public class Regions {
         return regionView;
     }
 
+    // Note: removed the streaming methods here for performance reasons
     public Regions move(Entity entity, Location destination) {
 
-        Set<Location> sourceLocations = regionsByLocation.entrySet().parallelStream()
-                .map(entry -> entry.getValue().find(entity))
-                .flatMap(l -> l.parallelStream())
-                .collect(Collectors.toSet());
+        Set<Location> sourceLocations = new HashSet<>();
+        for (Map.Entry<Location, Region> entry : regionsByLocation.entrySet()) {
+            Set<Location> locations = entry.getValue().find(entity);
+            sourceLocations.addAll(locations);
+        }
 
-        Map<Location, Region> sourceRegionsByLocation = sourceLocations.parallelStream()
-                .collect(Collectors.toMap(l -> l, l -> getRegion(l)));
+        Map<Location, Region> sourceRegionsByLocation = new HashMap<>();
+        for (Location sourceLocation : sourceLocations) {
+            sourceRegionsByLocation.put(sourceLocation, getRegion(sourceLocation));
+        }
 
-        Region targetRegion = regionsByLocation.entrySet().parallelStream()
-                .filter(e -> e.getValue().contains(destination))
-                .map(e -> e.getValue())
-                .findAny().orElse(null);
+        Region targetRegion = null;
+        for (Map.Entry<Location, Region> entry : regionsByLocation.entrySet()) {
+            Region region = entry.getValue();
+            if (region.contains(destination)) {
+                targetRegion = region;
+                break;
+            }
+        }
 
         Map<Location, Region> regions = new HashMap<>(regionsByLocation);
 

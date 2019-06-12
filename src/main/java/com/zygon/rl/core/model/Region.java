@@ -78,16 +78,15 @@ public final class Region {
         // Add to loc -> entity mapping
         Map<Location, List<Entity>> entsByLoc = entitiesByLocation;
 
-        newEntitiesByLocation.entrySet().parallelStream()
-                .forEach(entry -> {
-                    Location location = entry.getKey();
-                    List<Entity> ents = entsByLoc.get(location);
-                    if (ents == null) {
-                        ents = new ArrayList<>();
-                        entsByLoc.put(location, ents);
-                    }
-                    ents.addAll(entry.getValue());
-                });
+        for (Map.Entry<Location, List<Entity>> entry : newEntitiesByLocation.entrySet()) {
+            Location location = entry.getKey();
+            List<Entity> ents = entsByLoc.get(location);
+            if (ents == null) {
+                ents = new ArrayList<>();
+                entsByLoc.put(location, ents);
+            }
+            ents.addAll(entry.getValue());
+        }
 
         // Add to entity -> loc mapping
         Map<Entity, Set<Location>> locByEntity = locationsByEntity;
@@ -97,14 +96,14 @@ public final class Region {
 
         for (Map.Entry<Location, List<Entity>> entry : newEntitiesByLocation.entrySet()) {
             Location location = entry.getKey();
-            entry.getValue().forEach(entity -> {
+            for (Entity entity : entry.getValue()) {
                 Set<Location> entityLocs = locByEntity.get(entity);
                 if (entityLocs == null) {
                     entityLocs = new HashSet<>();
                     locByEntity.put(entity, entityLocs);
                 }
                 entityLocs.add(location);
-            });
+            }
 
             newMin = getMin(newMin == null ? minValues : newMin, location);
             newMax = getMax(newMax == null ? maxValues : newMax, location);
@@ -145,11 +144,15 @@ public final class Region {
     }
 
     public Set<Location> find(String entityName) {
-        return Collections.unmodifiableSet(locationsByEntity.entrySet().stream()
-                .filter(e -> e.getKey().getName().equals(entityName))
-                .map(Map.Entry::getValue)
-                .flatMap(e -> e.stream())
-                .collect(Collectors.toSet()));
+        Set<Location> finds = new HashSet<>();
+
+        for (Map.Entry<Entity, Set<Location>> entry : locationsByEntity.entrySet()) {
+            if (entry.getKey().getName().equals(entityName)) {
+                finds.addAll(entry.getValue());
+            }
+        }
+
+        return finds;
     }
 
     public Set<Location> find(Entity entity) {

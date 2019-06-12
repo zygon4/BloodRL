@@ -16,7 +16,6 @@ import com.zygon.rl.core.model.Attribute;
 import com.zygon.rl.core.model.Entity;
 import com.zygon.rl.core.model.Game;
 import com.zygon.rl.core.model.Location;
-import com.zygon.rl.core.model.Region;
 import com.zygon.rl.core.model.Regions;
 import com.zygon.rl.core.view.Style;
 
@@ -62,11 +61,15 @@ class GDXRegionRenderer extends GDXComponent {
     @Override
     protected void renderComponent(int xx, int yy, int maxWidth, int maxHeight) {
 
+        Regions regions = getGame().getRegions();
         Location withRespectTo = withRespectLocationSupplier.get();
-        Region viewRegion = createDisplayRegion(getGame(), withRespectTo, maxWidth, maxHeight);
+        RenderRegion viewRegion = createDisplayRegion(withRespectTo, maxWidth, maxHeight);
 
         // Note these are zero-based
-        float[][] lightResistances = fovHelper.generateSimpleResistances(viewRegion);
+        float[][] lightResistances = fovHelper.generateSimpleResistances(
+                regions, viewRegion.getStartLoc(),
+                viewRegion.getViewWidthMax(), viewRegion.getViewHeightMax());
+
         LitMap2d lightMap = new LitMap2DImpl(lightResistances);
         ShadowCaster2d shadowCaster = new ShadowCaster2d(lightMap);
 
@@ -95,7 +98,7 @@ class GDXRegionRenderer extends GDXComponent {
         int fontSize = (int) (density * 12);
         int fontBuffer = fontSize + 8;
 
-        RegionView regionView = new RegionView(viewRegion, withRespectTo, 10);
+        RegionView regionView = new RegionView(regions, withRespectTo, 10);
         int viewWidthMax = (maxWidth / fontBuffer);
         int viewHeightMax = (maxHeight / fontBuffer);
 
@@ -153,10 +156,8 @@ class GDXRegionRenderer extends GDXComponent {
     }
 
     // REMEMBER! maxWidthPixels/maxHeightPixels are the DISPLAY coords, NOTHING to do with the REGION
-    private Region createDisplayRegion(Game game, Location withRespectTo,
+    private RenderRegion createDisplayRegion(Location withRespectTo,
             int maxWidthPixels, int maxHeightPixels) {
-
-        Regions regions = game.getRegions();
 
         int wrtX = withRespectTo.getX();
         int wrtY = withRespectTo.getY();
@@ -175,7 +176,7 @@ class GDXRegionRenderer extends GDXComponent {
         int viewWidthMax = maxWidthPixels / fontBuffer;
         int viewHeightMax = maxHeightPixels / fontBuffer;
 
-        return regions.getView(startLoc, viewWidthMax, viewHeightMax);
+        return new RenderRegion(startLoc, viewWidthMax, viewHeightMax);
     }
 
     private static final Comparator<Entity> ENTITY_COMPARE = (e1, e2) -> {
@@ -244,6 +245,31 @@ class GDXRegionRenderer extends GDXComponent {
         @Override
         public void addLight(int currentX, int currentY, float bright) {
             this.light[currentX][currentY] = bright;
+        }
+    }
+
+    private static final class RenderRegion {
+
+        private final Location startLoc;
+        private final int viewWidthMax;
+        private final int viewHeightMax;
+
+        public RenderRegion(Location startLoc, int viewWidthMax, int viewHeightMax) {
+            this.startLoc = startLoc;
+            this.viewWidthMax = viewWidthMax;
+            this.viewHeightMax = viewHeightMax;
+        }
+
+        public Location getStartLoc() {
+            return startLoc;
+        }
+
+        public int getViewHeightMax() {
+            return viewHeightMax;
+        }
+
+        public int getViewWidthMax() {
+            return viewWidthMax;
         }
     }
 }

@@ -2,7 +2,7 @@ package com.zygon.rl.common.view;
 
 import com.zygon.rl.core.model.Entity;
 import com.zygon.rl.core.model.Location;
-import com.zygon.rl.core.model.Region;
+import com.zygon.rl.core.model.Regions;
 
 import java.util.List;
 import java.util.Objects;
@@ -17,12 +17,12 @@ public class RegionView {
 //        SQUARE
 //    }
 //
-    private final Region region;
+    private final Regions regions;
     private final Location center;
     private final int radius;
 
-    public RegionView(Region region, Location center, int radius) {
-        this.region = Objects.requireNonNull(region);
+    public RegionView(Regions regions, Location center, int radius) {
+        this.regions = Objects.requireNonNull(regions);
         this.center = Objects.requireNonNull(center);
         this.radius = radius;
     }
@@ -48,6 +48,6 @@ public class RegionView {
 
         Location reviewLocation = Location.create(regionLocX, regionLocY);
 
-        return region.get(reviewLocation);
+        return regions.get(reviewLocation);
     }
 }

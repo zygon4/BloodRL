@@ -10,7 +10,7 @@ import com.zygon.rl.core.model.Attribute;
 import com.zygon.rl.core.model.DoubleAttribute;
 import com.zygon.rl.core.model.Entity;
 import com.zygon.rl.core.model.Location;
-import com.zygon.rl.core.model.Region;
+import com.zygon.rl.core.model.Regions;
 
 import java.util.List;
 import java.util.Set;
@@ -23,17 +23,14 @@ public class FOVHelper {
 
     public static final String VIEW_BLOCK_NAME = CommonAttributes.VIEW_BLOCK.name();
 
-    public float[][] generateSimpleResistances(Region region) {
+    public float[][] generateSimpleResistances(Regions regions, Location minValues,
+            int width, int height) {
 
-        Location minValues = region.getMinValues();
-
-        int width = region.getWidth();
-        int height = region.getHeight();
         float[][] portion = new float[width][height];
 
         for (int x = minValues.getX(); x < minValues.getX() + width; x++) {
             for (int y = minValues.getY(); y < minValues.getY() + height; y++) {
-                List<Entity> entities = region.get(Location.create(x, y));
+                List<Entity> entities = regions.get(Location.create(x, y));
 
                 // TBD: "view blocking" as first attempt at light layering
                 double viewBlocking = 0.0;

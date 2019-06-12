@@ -7,6 +7,7 @@
  */
 package com.zygon.rl.core.model;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class Location {
         this.y = y;
         this.z = z;
 
-        this.hashCode = createHashCode(this.x, this.y, this.z);
+        this.hashCode = createHashCode(false, this.x, this.y, this.z);
     }
 
     public double getDistance(Location o) {
@@ -75,20 +76,26 @@ public class Location {
         return z;
     }
 
-    public static Location create(int x, int y, int z) {
-        int hash = createHashCode(x, y, z);
+    private static Location create(boolean useDisplayMethod, int x, int y, int z) {
+        int hash = createHashCode(useDisplayMethod, x, y, z);
         if (KNOWN_LOCATIONS.containsKey(hash)) {
-            Location test = KNOWN_LOCATIONS.get(hash);
-            if (test.getX() != x || test.getY() != y) {
-                throw new RuntimeException();
+            Location loc = KNOWN_LOCATIONS.get(hash);
+
+            if (loc.getX() != x || loc.getY() != y) {
+                // hash collision, fallback to slower hashing method
+                return create(true, x, y, z);
             }
 
-            return KNOWN_LOCATIONS.get(hash);
+            return loc;
         } else {
             Location location = new Location(x, y, z);
             KNOWN_LOCATIONS.put(hash, location);
             return location;
         }
+    }
+
+    public static Location create(int x, int y, int z) {
+        return create(false, x, y, z);
     }
 
     public static Location create(int x, int y) {
@@ -123,7 +130,8 @@ public class Location {
         return "[" + x + "," + y + "," + z + "]";
     }
 
-    private static int createHashCode(int x, int y, int z) {
-        return getDisplay(x, y, z).hashCode();
+    private static int createHashCode(boolean useDisplayMethod, int... coords) {
+        return !useDisplayMethod
+                ? Arrays.hashCode(coords) : getDisplay(coords[0], coords[1], coords[2]).hashCode();
     }
 }

@@ -14,14 +14,13 @@ import com.zygon.rl.core.model.DoubleAttribute;
 import com.zygon.rl.core.model.Entity;
 import com.zygon.rl.core.model.Game;
 import com.zygon.rl.core.model.Location;
+import com.zygon.rl.core.model.Pair;
 import com.zygon.rl.core.model.Region;
 import com.zygon.rl.core.model.Regions;
 import com.zygon.rl.core.system.GameSystem;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
@@ -98,9 +97,9 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                 break;
             case "MOVE":
                 // Can result in bump-to-interact
-                Map<Regions, Integer> timeTakenByRegion = interactPlayer(action, game);
-                Regions regions = timeTakenByRegion.keySet().stream().findAny().orElse(null);
-                int timeTaken = timeTakenByRegion.get(regions);
+                Pair<Regions, Integer> timeTakenByRegion = interactPlayer(action, game);
+                Regions regions = timeTakenByRegion.getLeft();
+                int timeTaken = timeTakenByRegion.getRight();
 
                 newGame = newGame.copy()
                         .moveTime(timeTaken, TimeUnit.SECONDS)
@@ -140,7 +139,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
     }
 
     // Returns single element of Regions -> time taken
-    private Map<Regions, Integer> interactPlayer(Action action, Game game) {
+    private Pair<Regions, Integer> interactPlayer(Action action, Game game) {
         Regions regions = game.getRegions();
         Location playerLoc = regions.find(Entities.PLAYER).stream()
                 .findAny().get();
@@ -231,9 +230,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
             }
         }
 
-        Map<Regions, Integer> result = new HashMap<>();
-        result.put(regions, timeToInteract);
-        return result;
+        return Pair.create(regions, timeToInteract);
     }
 
     private static Regions grow(final Regions regions, Direction direction, RegionHelper regionHelper) {
