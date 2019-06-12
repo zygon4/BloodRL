@@ -6,12 +6,14 @@ Beginnings of a kitchen-sink vampire Roguelike:
 
 Features: 
 * Infinite scroll map generation
+* Variety of areas (swamps, forests, cities, etc)
 * Shadowcasting
 * Openable/closeable doors&windows
 * Simple wandering "monsters" (no way to interact yet)
 
 TODOs:
-* Too many to list
+* HUD/title bars
+* Too many to list, really
 
 Current java main is:
 com.zygon.rl.blood.context.BloodLauncher
