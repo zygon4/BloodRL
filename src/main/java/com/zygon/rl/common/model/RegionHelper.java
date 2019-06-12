@@ -244,9 +244,11 @@ public class RegionHelper {
         // TODO: fix this "city" concept, it's an invasive concept here
         Map<Location, Set<Entity>> cityEntitiesByLocation = Collections.emptyMap();
         if (fillCity) {
+            // TODO: random check for "walled city"
+            Random rand = new Random();
             Grid grid = new Grid(maxX, maxY);
-            CityGenerator cityGenerator = new CityGenerator();
-            cityGenerator.setMinRoomSize(5);
+            CityGenerator cityGenerator = new CityGenerator(rand, rand.nextBoolean());
+            cityGenerator.setMinRoomSize(3);
             int roomGenAttempts = (grid.getWidth() / cityGenerator.getMaxRoomSize())
                     * (grid.getHeight() / cityGenerator.getMaxRoomSize());
             cityGenerator.setRoomGenerationAttempts(roomGenAttempts * 2);
@@ -324,9 +326,15 @@ public class RegionHelper {
 
     private static class CityGenerator extends DungeonGenerator {
 
-        private final Random rand = new Random();
         // Not immutable for performance
         private final Map<Location, Set<Entity>> roomsEntitiesByLocation = new HashMap<>();
+        private final Random rand;
+        private final boolean border;
+
+        public CityGenerator(Random rand, boolean border) {
+            this.rand = rand != null ? rand : new Random();
+            this.border = border;
+        }
 
         // Includes walls
         private Map<Location, Set<Entity>> getRoomsEntitiesByLocation() {
@@ -365,6 +373,38 @@ public class RegionHelper {
                     }
                 }
             }
+        }
+
+        @Override
+        public void generate(Grid grid) {
+
+            if (border) {
+                int gridX = grid.getWidth();
+                int gridY = grid.getHeight();
+
+                Set<Entity> entities = new HashSet<>();
+                entities.add(Entities.WALL);
+
+                for (int y = 0; y < gridY; y++) {
+                    if (y % 2 == 0) {
+                        Location locationXmin = Location.create(0, y);
+                        Location locationXMax = Location.create(gridX - 1, y);
+                        roomsEntitiesByLocation.put(locationXmin, entities);
+                        roomsEntitiesByLocation.put(locationXMax, entities);
+                    }
+                }
+
+                for (int x = 0; x < gridX; x++) {
+                    if (x % 2 == 0) {
+                        Location locationYmin = Location.create(x, 0);
+                        Location locationYMax = Location.create(x, gridY - 1);
+                        roomsEntitiesByLocation.put(locationYmin, entities);
+                        roomsEntitiesByLocation.put(locationYMax, entities);
+                    }
+                }
+            }
+
+            super.generate(grid);
         }
 
         @Override
