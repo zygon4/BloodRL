@@ -233,72 +233,90 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
         return Pair.create(regions, timeToInteract);
     }
 
+    private static final int PAD_DEPTH = 8;
+
+    // naive growth - just adds a full row or column on a side
     private static Regions grow(final Regions regions, Direction direction, RegionHelper regionHelper) {
         Regions newRegions = regions;
         int numberOfRegions = calcSideRegions(newRegions, direction);
 
         switch (direction) {
             case NORTH: {
-                int newLocationY = newRegions.getMaxValues().getY() + 1;
-                int startingX = newRegions.getMinValues().getX();
 
-                for (int i = 0; i < numberOfRegions; i++) {
-                    if (i > 0) {
-                        startingX += Regions.REGION_EDGE_SIZE;
+                for (int depth = 0; depth < PAD_DEPTH; depth++) {
+                    // Doesn't need to be multiplied by 'depth' - 'newRegions.getMaxValues()'
+                    // is recalculated each time.
+                    int newLocationY = newRegions.getMaxValues().getY() + 1;
+                    int startingX = newRegions.getMinValues().getX();
+
+                    // pads the NORTH side with 'numberOfRegions' regions
+                    for (int i = 0; i < numberOfRegions; i++) {
+                        if (i > 0) {
+                            startingX += Regions.REGION_EDGE_SIZE;
+                        }
+
+                        Location loc = Location.create(startingX, newLocationY);
+                        Region newRegion = regionHelper.generateRegion(loc,
+                                Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
+                        newRegions = newRegions.add(newRegion);
                     }
-
-                    Location loc = Location.create(startingX, newLocationY);
-                    Region newRegion = regionHelper.generateRegion(loc,
-                            Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
-                    newRegions = newRegions.add(newRegion);
                 }
             }
             break;
             case SOUTH: {
-                int newLocationY = newRegions.getMinValues().getY() - Regions.REGION_EDGE_SIZE;
-                int startingX = newRegions.getMinValues().getX();
+                for (int depth = 0; depth < PAD_DEPTH; depth++) {
+                    int newLocationY = newRegions.getMinValues().getY() - Regions.REGION_EDGE_SIZE;
+                    int startingX = newRegions.getMinValues().getX();
 
-                for (int i = 0; i < numberOfRegions; i++) {
-                    if (i > 0) {
-                        startingX += Regions.REGION_EDGE_SIZE;
+                    // pads the SOUTH side with 'numberOfRegions' regions
+                    for (int i = 0; i < numberOfRegions; i++) {
+                        if (i > 0) {
+                            startingX += Regions.REGION_EDGE_SIZE;
+                        }
+
+                        Location loc = Location.create(startingX, newLocationY);
+                        Region newRegion = regionHelper.generateRegion(loc,
+                                Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
+                        newRegions = newRegions.add(newRegion);
                     }
-
-                    Location loc = Location.create(startingX, newLocationY);
-                    Region newRegion = regionHelper.generateRegion(loc,
-                            Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
-                    newRegions = newRegions.add(newRegion);
                 }
             }
             break;
             case EAST: {
-                int newLocationX = newRegions.getMaxValues().getX() + 1;
-                int startingY = newRegions.getMinValues().getY();
+                for (int depth = 0; depth < PAD_DEPTH; depth++) {
+                    int newLocationX = newRegions.getMaxValues().getX() + 1;
+                    int startingY = newRegions.getMinValues().getY();
 
-                for (int i = 0; i < numberOfRegions; i++) {
-                    if (i > 0) {
-                        startingY += Regions.REGION_EDGE_SIZE;
+                    // pads the EAST side with 'numberOfRegions' regions
+                    for (int i = 0; i < numberOfRegions; i++) {
+                        if (i > 0) {
+                            startingY += Regions.REGION_EDGE_SIZE;
+                        }
+
+                        Location loc = Location.create(newLocationX, startingY);
+                        Region newRegion = regionHelper.generateRegion(loc,
+                                Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
+                        newRegions = newRegions.add(newRegion);
                     }
-
-                    Location loc = Location.create(newLocationX, startingY);
-                    Region newRegion = regionHelper.generateRegion(loc,
-                            Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
-                    newRegions = newRegions.add(newRegion);
                 }
             }
             break;
             case WEST: {
-                int newLocationX = newRegions.getMinValues().getX() - Regions.REGION_EDGE_SIZE;
-                int startingY = newRegions.getMinValues().getY();
+                for (int depth = 0; depth < PAD_DEPTH; depth++) {
+                    int newLocationX = newRegions.getMinValues().getX() - Regions.REGION_EDGE_SIZE;
+                    int startingY = newRegions.getMinValues().getY();
 
-                for (int i = 0; i < numberOfRegions; i++) {
-                    if (i > 0) {
-                        startingY += Regions.REGION_EDGE_SIZE;
+                    // pads the WEST side with 'numberOfRegions' regions
+                    for (int i = 0; i < numberOfRegions; i++) {
+                        if (i > 0) {
+                            startingY += Regions.REGION_EDGE_SIZE;
+                        }
+
+                        Location loc = Location.create(newLocationX, startingY);
+                        Region newRegion = regionHelper.generateRegion(loc,
+                                Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
+                        newRegions = newRegions.add(newRegion);
                     }
-
-                    Location loc = Location.create(newLocationX, startingY);
-                    Region newRegion = regionHelper.generateRegion(loc,
-                            Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
-                    newRegions = newRegions.add(newRegion);
                 }
             }
             break;
