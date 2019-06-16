@@ -19,10 +19,17 @@ import com.zygon.rl.core.model.Region;
 import com.zygon.rl.core.model.Regions;
 import com.zygon.rl.core.system.GameSystem;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiFunction;
 
 /**
@@ -36,7 +43,8 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
     private final Set<Integer> gameInputs = new HashSet<>();
     private final GDXInputAdapter directionInputAdapter;
     private final GameSystem simpleAi = new SimpleAI();
-    private final RegionHelper regionHelper = new RegionHelper();
+    private final GrowthProcessor growthProcessor = new GrowthProcessor();
+    private final Map<Direction, Long> growthIdsByDirection = new HashMap<>();
 
     {
         //TODO: Again, can't have gdx here
@@ -101,6 +109,35 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                 Regions regions = timeTakenByRegion.getLeft();
                 int timeTaken = timeTakenByRegion.getRight();
 
+                // Game region growth: Uses parallel processing
+                // Grow needs a "hard stop" and a "soft start" where the player
+                // is somewhat nearby, we want to generate and hold the region
+                Direction regionGrowthDirection = getRegionGrowthDirection(regions, 1);
+
+                if (regionGrowthDirection != null) {
+                    // If this throws an NPE, it's because the soft growth wasn't
+                    // started, that's *probably* a bug.
+                    long growthId = growthIdsByDirection.get(regionGrowthDirection);
+                    Set<Region> growthRegions = growthProcessor.growRegions(growthId);
+                    regions = finishGrowth(regions, regionGrowthDirection, growthRegions);
+                }
+
+                Direction regionGrowthStartDirection = getRegionGrowthDirection(regions, 4);
+
+                if (regionGrowthStartDirection != null) {
+                    // Check if growth is started, if not, start some
+                    if (!growthIdsByDirection.containsKey(regionGrowthStartDirection)) {
+                        long growthId = growthProcessor.growRegions(regions, regionGrowthStartDirection);
+                        growthIdsByDirection.put(regionGrowthStartDirection, growthId);
+                    } else {
+                        long growthId = growthIdsByDirection.get(regionGrowthStartDirection);
+                        if (growthProcessor.isDone(growthId)) {
+                            Set<Region> growthRegions = growthProcessor.growRegions(growthId);
+                            regions = finishGrowth(regions, regionGrowthStartDirection, growthRegions);
+                        }
+                    }
+                }
+
                 newGame = newGame.copy()
                         .moveTime(timeTaken, TimeUnit.SECONDS)
                         .setRegions(regions)
@@ -127,6 +164,48 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
         newGame = simpleAi.getGameUpdate().apply(newGame);
 
         return newGame;
+    }
+
+    private Regions finishGrowth(Regions regions, Direction direction, Set<Region> newRegions) {
+        for (Region region : newRegions) {
+            regions = regions.add(region);
+        }
+        growthIdsByDirection.remove(direction);
+        return regions;
+    }
+
+    /**
+     * Returns a Direction if the region requires growth depending on the growth
+     * factor times the region size.
+     *
+     * @param regions the regions to check
+     * @param growthToleranceFactor the growth factor.
+     * @return a Direction where growth is needed.
+     */
+    private Direction getRegionGrowthDirection(Regions regions, int growthToleranceFactor) {
+
+        Location playerLoc = regions.find(Entities.PLAYER).stream().findAny().get();
+        int growRegionTolerance = Regions.REGION_EDGE_SIZE * growthToleranceFactor;
+        Direction regionGrowthDirection = null;
+
+        // Logic to grow the region space
+        if (regions.getMaxValues().getX() - playerLoc.getX() <= growRegionTolerance - 1) {
+            regionGrowthDirection = Direction.EAST;
+        }
+
+        if (regions.getMaxValues().getY() - playerLoc.getY() <= growRegionTolerance - 1) {
+            regionGrowthDirection = Direction.NORTH;
+        }
+
+        if (playerLoc.getX() - regions.getMinValues().getX() <= growRegionTolerance - 1) {
+            regionGrowthDirection = Direction.WEST;
+        }
+
+        if (playerLoc.getY() - regions.getMinValues().getY() <= growRegionTolerance - 1) {
+            regionGrowthDirection = Direction.SOUTH;
+        }
+
+        return regionGrowthDirection;
     }
 
     private boolean canMove(Location destination, Regions regions) {
@@ -198,26 +277,6 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                     .max().orElse(0.0);
 
             timeToInteract += (int) (timeToInteract * terrainDifficulty);
-
-            // Will probably need to increase this
-            int growRegionTolerance = Regions.REGION_EDGE_SIZE * 2;
-
-            // Logic to grow the region space
-            if (regions.getMaxValues().getX() - destination.getX() <= growRegionTolerance - 1) {
-                regions = grow(regions, Direction.EAST, regionHelper);
-            }
-
-            if (regions.getMaxValues().getY() - destination.getY() <= growRegionTolerance - 1) {
-                regions = grow(regions, Direction.NORTH, regionHelper);
-            }
-
-            if (destination.getX() - regions.getMinValues().getX() <= growRegionTolerance - 1) {
-                regions = grow(regions, Direction.WEST, regionHelper);
-            }
-
-            if (destination.getY() - regions.getMinValues().getY() <= growRegionTolerance - 1) {
-                regions = grow(regions, Direction.SOUTH, regionHelper);
-            }
         } else {
             // TODO: need to make this more robust to handle other types of
             // interacts, ie bump to attack
@@ -231,98 +290,6 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
         }
 
         return Pair.create(regions, timeToInteract);
-    }
-
-    private static final int PAD_DEPTH = 8;
-
-    // naive growth - just adds a full row or column on a side
-    private static Regions grow(final Regions regions, Direction direction, RegionHelper regionHelper) {
-        Regions newRegions = regions;
-        int numberOfRegions = calcSideRegions(newRegions, direction);
-
-        switch (direction) {
-            case NORTH: {
-
-                for (int depth = 0; depth < PAD_DEPTH; depth++) {
-                    // Doesn't need to be multiplied by 'depth' - 'newRegions.getMaxValues()'
-                    // is recalculated each time.
-                    int newLocationY = newRegions.getMaxValues().getY() + 1;
-                    int startingX = newRegions.getMinValues().getX();
-
-                    // pads the NORTH side with 'numberOfRegions' regions
-                    for (int i = 0; i < numberOfRegions; i++) {
-                        if (i > 0) {
-                            startingX += Regions.REGION_EDGE_SIZE;
-                        }
-
-                        Location loc = Location.create(startingX, newLocationY);
-                        Region newRegion = regionHelper.generateRegion(loc,
-                                Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
-                        newRegions = newRegions.add(newRegion);
-                    }
-                }
-            }
-            break;
-            case SOUTH: {
-                for (int depth = 0; depth < PAD_DEPTH; depth++) {
-                    int newLocationY = newRegions.getMinValues().getY() - Regions.REGION_EDGE_SIZE;
-                    int startingX = newRegions.getMinValues().getX();
-
-                    // pads the SOUTH side with 'numberOfRegions' regions
-                    for (int i = 0; i < numberOfRegions; i++) {
-                        if (i > 0) {
-                            startingX += Regions.REGION_EDGE_SIZE;
-                        }
-
-                        Location loc = Location.create(startingX, newLocationY);
-                        Region newRegion = regionHelper.generateRegion(loc,
-                                Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
-                        newRegions = newRegions.add(newRegion);
-                    }
-                }
-            }
-            break;
-            case EAST: {
-                for (int depth = 0; depth < PAD_DEPTH; depth++) {
-                    int newLocationX = newRegions.getMaxValues().getX() + 1;
-                    int startingY = newRegions.getMinValues().getY();
-
-                    // pads the EAST side with 'numberOfRegions' regions
-                    for (int i = 0; i < numberOfRegions; i++) {
-                        if (i > 0) {
-                            startingY += Regions.REGION_EDGE_SIZE;
-                        }
-
-                        Location loc = Location.create(newLocationX, startingY);
-                        Region newRegion = regionHelper.generateRegion(loc,
-                                Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
-                        newRegions = newRegions.add(newRegion);
-                    }
-                }
-            }
-            break;
-            case WEST: {
-                for (int depth = 0; depth < PAD_DEPTH; depth++) {
-                    int newLocationX = newRegions.getMinValues().getX() - Regions.REGION_EDGE_SIZE;
-                    int startingY = newRegions.getMinValues().getY();
-
-                    // pads the WEST side with 'numberOfRegions' regions
-                    for (int i = 0; i < numberOfRegions; i++) {
-                        if (i > 0) {
-                            startingY += Regions.REGION_EDGE_SIZE;
-                        }
-
-                        Location loc = Location.create(newLocationX, startingY);
-                        Region newRegion = regionHelper.generateRegion(loc,
-                                Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
-                        newRegions = newRegions.add(newRegion);
-                    }
-                }
-            }
-            break;
-        }
-
-        return newRegions;
     }
 
     private static int calcSideRegions(Regions regions, Direction direction) {
@@ -346,7 +313,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
         return (max - min + 1) / Regions.REGION_EDGE_SIZE;
     }
 
-    private final class CloseDirectionGameActionProvider extends DirectionGameActionProvider {
+    private static final class CloseDirectionGameActionProvider extends DirectionGameActionProvider {
 
         @Override
         protected Game handle(Game game, Location destination) {
@@ -386,7 +353,7 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
         }
     }
 
-    private final class OpenDirectionGameActionProvider extends DirectionGameActionProvider {
+    private static final class OpenDirectionGameActionProvider extends DirectionGameActionProvider {
 
         @Override
         protected Game handle(Game game, Location destination) {
@@ -429,6 +396,139 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                     .findAny().orElse(null);
 
             return openable;
+        }
+    }
+
+    private static final class GrowthProcessor {
+
+        // How deep to pad, region wise
+        private static final int PAD_DEPTH = 2;
+
+        private final ExecutorService executor = Executors.newFixedThreadPool(4);
+        private final RegionHelper regionHelper = new RegionHelper();
+        private final Map<Long, Future<Set<Region>>> regionFuturesByGrowthId = new HashMap<>();
+        private final AtomicLong growthIds = new AtomicLong();
+
+        public long growRegions(final Regions regions, Direction direction) {
+            Future<Set<Region>> regionGrowthFuture = executor.submit(() -> {
+                Set<Region> newRegions = grow(regions, direction);
+                return newRegions;
+            });
+
+            long growthId = growthIds.getAndIncrement();
+            regionFuturesByGrowthId.put(growthId, regionGrowthFuture);
+            return growthId;
+        }
+
+        // will block until done
+        public Set<Region> growRegions(long growthId) {
+
+            Future<Set<Region>> regionsFuture = regionFuturesByGrowthId.get(growthId);
+            try {
+                Set<Region> regions = regionsFuture.get();
+                regionFuturesByGrowthId.remove(growthId);
+                return regions;
+            } catch (ExecutionException | InterruptedException e) {
+                // TBD: log? throw runtime?
+                // return null for now..
+            }
+
+            return null;
+        }
+
+        public boolean isDone(long growthId) {
+            Future<Set<Region>> regionsFuture = regionFuturesByGrowthId.get(growthId);
+            return regionsFuture.isDone();
+        }
+
+        // naive growth - just adds a full row or column on a side
+        public synchronized Set<Region> grow(final Regions regions, Direction direction) {
+            Set<Region> growthRegions = new HashSet<>();
+            int numberOfRegions = calcSideRegions(regions, direction);
+
+            switch (direction) {
+                case NORTH: {
+
+                    for (int depth = 0; depth < PAD_DEPTH; depth++) {
+                        // Doesn't need to be multiplied by 'depth' - 'newRegions.getMaxValues()'
+                        // is recalculated each time.
+                        int newLocationY = regions.getMaxValues().getY() + 1;
+                        int startingX = regions.getMinValues().getX();
+
+                        // pads the NORTH side with 'numberOfRegions' regions
+                        for (int i = 0; i < numberOfRegions; i++) {
+                            if (i > 0) {
+                                startingX += Regions.REGION_EDGE_SIZE;
+                            }
+
+                            Location loc = Location.create(startingX, newLocationY);
+                            Region newRegion = regionHelper.generateRegion(loc,
+                                    Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
+                            growthRegions.add(newRegion);
+                        }
+                    }
+                }
+                break;
+                case SOUTH: {
+                    for (int depth = 0; depth < PAD_DEPTH; depth++) {
+                        int newLocationY = regions.getMinValues().getY() - Regions.REGION_EDGE_SIZE;
+                        int startingX = regions.getMinValues().getX();
+
+                        // pads the SOUTH side with 'numberOfRegions' regions
+                        for (int i = 0; i < numberOfRegions; i++) {
+                            if (i > 0) {
+                                startingX += Regions.REGION_EDGE_SIZE;
+                            }
+
+                            Location loc = Location.create(startingX, newLocationY);
+                            Region newRegion = regionHelper.generateRegion(loc,
+                                    Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
+                            growthRegions.add(newRegion);
+                        }
+                    }
+                }
+                break;
+                case EAST: {
+                    for (int depth = 0; depth < PAD_DEPTH; depth++) {
+                        int newLocationX = regions.getMaxValues().getX() + 1;
+                        int startingY = regions.getMinValues().getY();
+
+                        // pads the EAST side with 'numberOfRegions' regions
+                        for (int i = 0; i < numberOfRegions; i++) {
+                            if (i > 0) {
+                                startingY += Regions.REGION_EDGE_SIZE;
+                            }
+
+                            Location loc = Location.create(newLocationX, startingY);
+                            Region newRegion = regionHelper.generateRegion(loc,
+                                    Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
+                            growthRegions.add(newRegion);
+                        }
+                    }
+                }
+                break;
+                case WEST: {
+                    for (int depth = 0; depth < PAD_DEPTH; depth++) {
+                        int newLocationX = regions.getMinValues().getX() - Regions.REGION_EDGE_SIZE;
+                        int startingY = regions.getMinValues().getY();
+
+                        // pads the WEST side with 'numberOfRegions' regions
+                        for (int i = 0; i < numberOfRegions; i++) {
+                            if (i > 0) {
+                                startingY += Regions.REGION_EDGE_SIZE;
+                            }
+
+                            Location loc = Location.create(newLocationX, startingY);
+                            Region newRegion = regionHelper.generateRegion(loc,
+                                    Regions.REGION_EDGE_SIZE, Regions.REGION_EDGE_SIZE, false);
+                            growthRegions.add(newRegion);
+                        }
+                    }
+                }
+                break;
+            }
+
+            return growthRegions;
         }
     }
 }
