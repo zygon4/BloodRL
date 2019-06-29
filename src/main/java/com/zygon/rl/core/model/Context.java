@@ -1,10 +1,3 @@
-/*
- * ========================================================================
- *
- * Copyright (c) by Hitachi Vantara, 2018. All rights reserved.
- *
- * ========================================================================
- */
 package com.zygon.rl.core.model;
 
 import java.util.HashSet;
