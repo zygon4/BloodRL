@@ -29,6 +29,8 @@ public class Entities {
             .setName(CommonAttributes.CLOSED.name()).setValue(Boolean.TRUE.toString()).build();
     private static final Attribute HEALTH = Attribute.builder()
             .setName(CommonAttributes.HEALTH.name()).setValue("100").build();
+    private static final Attribute LIVING = Attribute.builder()
+            .setName(CommonAttributes.LIVING.name()).setValue(Boolean.TRUE.toString()).build();
 
     public static Entity FLOOR = Entity.builder()
             .setName("FLOOR")
@@ -81,6 +83,7 @@ public class Entities {
             .setDescription("Monster")
             .setDisplayName("monster")
             .setAttributes(getAttributes(
+                    LIVING,
                     HEALTH,
                     IMPASSABLE,
                     create(CommonAttributes.VIEW_BLOCK.name(), "0.25").build()))
@@ -91,6 +94,7 @@ public class Entities {
             .setDescription("Player")
             .setDisplayName("player")
             .setAttributes(getAttributes(
+                    LIVING,
                     HEALTH,
                     IMPASSABLE,
                     create(CommonAttributes.VIEW_BLOCK.name(), "0.25").build()))
@@ -138,6 +142,12 @@ public class Entities {
 
     public static Entity createMonster(String name) {
         return MONSTER.copy()
+                .setDisplayName(name)
+                .build();
+    }
+
+    public static Entity createPlayer(String name) {
+        return PLAYER.copy()
                 .setDisplayName(name)
                 .build();
     }

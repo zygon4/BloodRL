@@ -69,7 +69,7 @@ public class RegionHelper {
 
         int randomLocation = rand.nextInt(availablePlayerLocations.size());
         Location randomPlayerLoc = availablePlayerLocations.get(randomLocation);
-        region = region.add(Entities.PLAYER, randomPlayerLoc);
+        region = region.add(Entities.createPlayer("Playa"), randomPlayerLoc);
 
         return region;
     }

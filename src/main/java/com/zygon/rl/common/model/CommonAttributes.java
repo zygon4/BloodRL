@@ -6,15 +6,16 @@
 package com.zygon.rl.common.model;
 
 /**
+ * Weird name for this enum.
  *
  * @author zygon
  */
 public enum CommonAttributes {
-
     CLOSED,
     HEALTH,
     IMPASSABLE,
     LOCKED,
+    LIVING,
     TERRAIN_DIFFICULTY,
     VIEW_BLOCK
 }

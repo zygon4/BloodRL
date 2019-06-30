@@ -17,6 +17,7 @@ import com.zygon.rl.core.model.Location;
 import com.zygon.rl.core.model.Pair;
 import com.zygon.rl.core.model.Region;
 import com.zygon.rl.core.model.Regions;
+import com.zygon.rl.core.model.living.Living;
 import com.zygon.rl.core.system.GameSystem;
 
 import java.util.HashMap;
@@ -38,6 +39,12 @@ import java.util.function.BiFunction;
  */
 public class OuterworldGameActionProvider implements BiFunction<Action, Game, Game> {
 
+    private enum BumpAction {
+        ATTACK,
+        MOVE,
+        OPEN;
+    }
+
     private static final String WHICH_DIRECTION = "which direction?";
 
     private final Set<Integer> gameInputs = new HashSet<>();
@@ -45,6 +52,13 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
     private final GameSystem simpleAi = new SimpleAI();
     private final GrowthProcessor growthProcessor = new GrowthProcessor();
     private final Map<Direction, Long> growthIdsByDirection = new HashMap<>();
+    private final CloseDirectionGameActionProvider closeDirectionGameActionProvider
+            = new CloseDirectionGameActionProvider();
+    private final OpenDirectionGameActionProvider openDirectionGameActionProvider
+            = new OpenDirectionGameActionProvider();
+    private final DirectionActionProvider directionActionProvider = new DirectionActionProvider();
+    private final OpenDirectionGameActionProvider openDirGameActionProv
+            = new OpenDirectionGameActionProvider();
 
     {
         //TODO: Again, can't have gdx here
@@ -78,8 +92,8 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                 System.exit(0);
             case "CLOSE":
                 Context closeCtx = Context.builder()
-                        .setActionProvider(new DirectionActionProvider())
-                        .setGameActionProvider(new CloseDirectionGameActionProvider())
+                        .setActionProvider(directionActionProvider)
+                        .setGameActionProvider(closeDirectionGameActionProvider)
                         .setInputSupplier(directionInputAdapter)
                         .setName("close")
                         .setDisplayName("Close " + WHICH_DIRECTION)
@@ -91,8 +105,8 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                 break;
             case "OPEN":
                 Context openCtx = Context.builder()
-                        .setActionProvider(new DirectionActionProvider())
-                        .setGameActionProvider(new OpenDirectionGameActionProvider())
+                        .setActionProvider(directionActionProvider)
+                        .setGameActionProvider(openDirectionGameActionProvider)
                         .setInputSupplier(directionInputAdapter)
                         .setName("open")
                         .setDisplayName("Open " + WHICH_DIRECTION)
@@ -105,8 +119,9 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
                 break;
             case "MOVE":
                 // Can result in bump-to-interact
-                Pair<Regions, Integer> timeTakenByRegion = interactPlayer(action, game);
-                Regions regions = timeTakenByRegion.getLeft();
+                Pair<Game, Integer> timeTakenByRegion = interactPlayer(action, game);
+                game = timeTakenByRegion.getLeft();
+                Regions regions = game.getRegions();
                 int timeTaken = timeTakenByRegion.getRight();
 
                 // Game region growth: Uses parallel processing
@@ -208,17 +223,34 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
         return regionGrowthDirection;
     }
 
-    private boolean canMove(Location destination, Regions regions) {
+    private BumpAction getBumpAction(Location destination, Regions regions) {
         Region region = regions.getRegion(destination);
 
         List<Entity> entities = region.get(destination);
-        return !entities.stream()
+
+        if (entities.stream()
+                .map(Living::new)
+                .filter(Living::isLiving)
+                .findAny().isPresent()) {
+            return BumpAction.ATTACK;
+        }
+
+        if (entities.stream()
                 .filter(e -> !e.getAttributes(CommonAttributes.IMPASSABLE.name()).isEmpty())
-                .findAny().isPresent();
+                .findAny().isEmpty()) {
+            return BumpAction.MOVE;
+        }
+
+        Entity openable = openDirGameActionProv.getOpenable(regions, destination);
+        if (openable != null && new Openable(openable).isClosed()) {
+            return BumpAction.OPEN;
+        }
+
+        return null;
     }
 
     // Returns single element of Regions -> time taken
-    private Pair<Regions, Integer> interactPlayer(Action action, Game game) {
+    private Pair<Game, Integer> interactPlayer(Action action, Game game) {
         Regions regions = game.getRegions();
         Location playerLoc = regions.find(Entities.PLAYER).stream()
                 .findAny().get();
@@ -266,30 +298,49 @@ public class OuterworldGameActionProvider implements BiFunction<Action, Game, Ga
         int timeToInteract = 6;
 
         // Could become more robust "getActionsAtDestination"
-        if (canMove(destination, regions)) {
-            regions = regions.move(Entities.PLAYER, destination);
+        BumpAction bumpAction = getBumpAction(destination, regions);
+        if (bumpAction != null) {
+            switch (bumpAction) {
+                case ATTACK:
+                    // TODO: handle attacking:
+                    // Maybe start with trivial "calculateDamage" interface
+                    // which can become complex over time but starts with hardcoded number?
 
-            // Find the entity with the highest terrain difficultly, if none, then no difficulty
-            double terrainDifficulty = regions.get(destination).stream()
-                    .map(e -> e.getAttributes(CommonAttributes.TERRAIN_DIFFICULTY.name()))
-                    .map(attributes -> attributes.stream().mapToDouble(td -> DoubleAttribute.create(td).getDoubleValue()).max())
-                    .mapToDouble(d -> d.orElse(0.0))
-                    .max().orElse(0.0);
+                    // TBD: a sort of "battledome" concept to calculate attack vs defense?
+                    Living attackable = regions.get(destination).stream()
+                            .map(Living::new)
+                            .filter(Living::isLiving)
+                            .findAny().orElse(null);
 
-            timeToInteract += (int) (timeToInteract * terrainDifficulty);
-        } else {
-            // TODO: need to make this more robust to handle other types of
-            // interacts, ie bump to attack
-            OpenDirectionGameActionProvider openDirGameActionProv
-                    = new OpenDirectionGameActionProvider();
+                    System.out.println("ATTACKING " + attackable.getDisplayName());
 
-            Entity openable = openDirGameActionProv.getOpenable(regions, destination);
-            if (openable != null && new Openable(openable).isClosed()) {
-                regions = openDirGameActionProv.handle(game, destination).getRegions();
+                    game = game.copy().addLog("You attack " + attackable.getDisplayName()).build();
+                    timeToInteract *= 2;
+                    break;
+                case MOVE:
+                    regions = regions.move(Entities.PLAYER, destination);
+
+                    // Find the entity with the highest terrain difficultly, if none, then no difficulty
+                    double terrainDifficulty = regions.get(destination).stream()
+                            .map(e -> e.getAttributes(CommonAttributes.TERRAIN_DIFFICULTY.name()))
+                            .map(attributes -> attributes.stream()
+                            .mapToDouble(td -> DoubleAttribute.create(td).getDoubleValue())
+                            .max())
+                            .mapToDouble(d -> d.orElse(0.0))
+                            .max().orElse(0.0);
+
+                    timeToInteract += (int) (timeToInteract * terrainDifficulty);
+                    break;
+                case OPEN:
+                    Entity openable = openDirGameActionProv.getOpenable(regions, destination);
+                    if (openable != null && new Openable(openable).isClosed()) {
+                        regions = openDirGameActionProv.handle(game, destination).getRegions();
+                    }
+                    break;
             }
         }
 
-        return Pair.create(regions, timeToInteract);
+        return Pair.create(game.copy().setRegions(regions).build(), timeToInteract);
     }
 
     private static int calcSideRegions(Regions regions, Direction direction) {
