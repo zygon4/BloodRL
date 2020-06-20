@@ -35,7 +35,7 @@ public class Names {
     }
 
     private static String getRandom(String[] ls) {
-        int idx = NAME_RANDOM.nextInt(ls.length);
+        int idx = NAME_RANDOM.nextInt(ls.length - 1);
         return ls[idx];
     }
 }
